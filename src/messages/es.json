@@ -1,0 +1,144 @@
+{
+  "nav": {
+    "home": "Inicio",
+    "tombola": "Sorteo",
+    "winners": "Ganadores",
+    "shop": "Tienda",
+    "admin": "Admin"
+  },
+  "hero": {
+    "badge": "SORTEO GRATUITO",
+    "title": "GANA EL",
+    "titleHighlight": "DRAGÓN DORADO",
+    "subtitle": "¡Regístrate gratis y prueba tu suerte para ganar este legendario brainrot en Steal a Brainrot!",
+    "cta": "PARTICIPAR AHORA",
+    "watchYoutube": "Ver canal",
+    "participants": "participantes registrados",
+    "noEdition": "No hay sorteo activo ahora mismo",
+    "noEditionSub": "¡Vuelve pronto o suscríbete al canal para no perderte nada!"
+  },
+  "countdown": {
+    "title": "Sorteo en",
+    "days": "Días",
+    "hours": "Horas",
+    "minutes": "Minutos",
+    "seconds": "Segundos",
+    "ended": "¡El sorteo ya tuvo lugar!"
+  },
+  "form": {
+    "title": "Unirse al Sorteo",
+    "subtitle": "100% gratis — 1 participación por persona",
+    "email": "Correo electrónico",
+    "emailPlaceholder": "tu@correo.com",
+    "roblox": "Usuario de Roblox",
+    "robloxPlaceholder": "TuUsuarioRoblox",
+    "submit": "PARTICIPAR GRATIS",
+    "submitting": "Registrando...",
+    "success": "¡Estás dentro! ¡Buena suerte! 🐉",
+    "successSub": "Se ha enviado un correo de confirmación.",
+    "errorEmail": "Este correo ya está registrado.",
+    "errorRoblox": "Este usuario de Roblox ya está registrado.",
+    "errorGeneric": "Algo salió mal. Por favor inténtalo de nuevo.",
+    "rules": "Al participar aceptas el",
+    "rulesLink": "reglamento"
+  },
+  "how": {
+    "title": "¿Cómo funciona?",
+    "step1Title": "Regístrate",
+    "step1Desc": "Introduce tu correo y usuario de Roblox. Es gratis y tarda segundos.",
+    "step2Title": "Espera el sorteo",
+    "step2Desc": "En la fecha anunciada, se selecciona un ganador aleatoriamente entre todos los participantes.",
+    "step3Title": "¡Gana!",
+    "step3Desc": "El ganador recibe el brainrot directamente en el juego. ¡Anunciado en YouTube!"
+  },
+  "prize": {
+    "title": "El Premio",
+    "edition": "Edición"
+  },
+  "winners": {
+    "title": "Ganadores Anteriores",
+    "subtitle": "Los afortunados ganadores de ediciones pasadas",
+    "edition": "Edición",
+    "winner": "Ganador",
+    "prize": "Premio",
+    "date": "Fecha del sorteo",
+    "noWinners": "Aún no se ha realizado ningún sorteo."
+  },
+  "shop": {
+    "title": "Tienda",
+    "subtitle": "¡Productos exclusivos CIT muy pronto!",
+    "comingSoon": "EN CONSTRUCCIÓN",
+    "notify": "Notificarme"
+  },
+  "rulesSection": {
+    "title": "Reglamento",
+    "r1": "El sorteo es 100% gratuito. No es necesaria ninguna compra para participar.",
+    "r2": "Una sola participación por persona (correo electrónico y usuario de Roblox únicos).",
+    "r3": "El ganador se selecciona aleatoriamente entre todos los participantes en la fecha indicada.",
+    "r4bold": "En caso de ganar, tu usuario de Roblox será publicado públicamente en este sitio y potencialmente anunciado en el canal de YouTube de CIT.",
+    "r4end": "Al participar, aceptas esta condición.",
+    "r5": "CIT se reserva el derecho de cancelar o modificar el sorteo en caso de fuerza mayor.",
+    "r6": "El premio (brainrot en el juego) se entregará directamente a través de Roblox. CIT no es responsable de las posibles limitaciones del juego.",
+    "r7": "Cualquier intento de fraude (cuentas falsas, bots, etc.) resulta en descalificación inmediata.",
+    "organizer": "Organizador: CIT (@CITlevrai) — YouTube 732k suscriptores."
+  },
+  "footer": {
+    "rights": "Todos los derechos reservados",
+    "youtube": "Canal YouTube",
+    "discord": "Discord",
+    "rules": "Reglamento"
+  },
+  "admin": {
+    "login": {
+      "title": "Acceso Admin",
+      "password": "Contraseña",
+      "submit": "Iniciar sesión",
+      "error": "Contraseña incorrecta"
+    },
+    "dashboard": {
+      "title": "Panel",
+      "currentEdition": "Edición actual",
+      "totalEntries": "Participantes",
+      "drawDate": "Fecha del sorteo",
+      "endDate": "Fecha de cierre",
+      "noEdition": "Ninguna edición activa",
+      "createEdition": "Crear edición",
+      "manageEntries": "Ver participantes",
+      "launchDraw": "Lanzar sorteo",
+      "logout": "Cerrar sesión"
+    },
+    "edition": {
+      "createTitle": "Nueva Edición",
+      "titleFr": "Título (Francés)",
+      "titleEn": "Título (Inglés)",
+      "titleEs": "Título (Español)",
+      "prizeName": "Nombre del premio",
+      "prizeImage": "URL de imagen del premio",
+      "endDate": "Fecha de cierre de inscripciones",
+      "drawDate": "Fecha del sorteo",
+      "create": "Crear edición",
+      "success": "¡Edición creada!"
+    },
+    "entries": {
+      "title": "Participantes",
+      "email": "Correo",
+      "roblox": "Usuario Roblox",
+      "date": "Registrado el",
+      "total": "Total",
+      "export": "Exportar CSV",
+      "noEntries": "Aún no hay participantes."
+    },
+    "draw": {
+      "title": "Sorteo",
+      "subtitle": "Haz clic para lanzar el sorteo oficial",
+      "launch": "LANZAR SORTEO",
+      "winner": "GANADOR",
+      "noEntries": "No hay participantes registrados.",
+      "alreadyDrawn": "Ya se ha seleccionado un ganador para esta edición.",
+      "confirm": "¿Confirmar sorteo?",
+      "confirmText": "Esta acción no se puede deshacer.",
+      "yes": "¡Sí, lanzar!",
+      "cancel": "Cancelar"
+    }
+  }
+}

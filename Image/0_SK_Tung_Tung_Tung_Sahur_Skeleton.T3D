@@ -1,0 +1,9 @@
+Begin Object Class=/Script/Engine.Skeleton Name="0_SK_Tung_Tung_Tung_Sahur_Skeleton" ExportPath="/Script/Engine.Skeleton'/Supersteal/CaractherModel/Tung_Tung_Tung_Sahur/DefaultVariation/0_SK_Tung_Tung_Tung_Sahur_Skeleton.0_SK_Tung_Tung_Tung_Sahur_Skeleton'"
+   Begin Object Class=/Script/Engine.AnimCurveMetaData Name="AnimCurveMetaData_0" ExportPath="/Script/Engine.AnimCurveMetaData'/Supersteal/CaractherModel/Tung_Tung_Tung_Sahur/DefaultVariation/0_SK_Tung_Tung_Tung_Sahur_Skeleton.0_SK_Tung_Tung_Tung_Sahur_Skeleton:AnimCurveMetaData_0'"
+   End Object
+   Begin Object Name="AnimCurveMetaData_0" ExportPath="/Script/Engine.AnimCurveMetaData'/Supersteal/CaractherModel/Tung_Tung_Tung_Sahur/DefaultVariation/0_SK_Tung_Tung_Tung_Sahur_Skeleton.0_SK_Tung_Tung_Tung_Sahur_Skeleton:AnimCurveMetaData_0'"
+   End Object
+   BoneTree(13)=()
+   PreviewSkeletalMesh="/Supersteal/CaractherModel/Tung_Tung_Tung_Sahur/DefaultVariation/0_SK_Tung_Tung_Tung_Sahur.0_SK_Tung_Tung_Tung_Sahur"
+   AssetUserData(0)="/Script/Engine.AnimCurveMetaData'AnimCurveMetaData_0'"
+End Object
