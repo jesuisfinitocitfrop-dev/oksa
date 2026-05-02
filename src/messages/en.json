@@ -1,0 +1,144 @@
+{
+  "nav": {
+    "home": "Home",
+    "tombola": "Giveaway",
+    "winners": "Winners",
+    "shop": "Shop",
+    "admin": "Admin"
+  },
+  "hero": {
+    "badge": "FREE GIVEAWAY",
+    "title": "WIN THE",
+    "titleHighlight": "GOLDEN DRAGON",
+    "subtitle": "Register for free and try your luck to win this legendary brainrot in Steal a Brainrot!",
+    "cta": "ENTER NOW",
+    "watchYoutube": "Watch Channel",
+    "participants": "registered participants",
+    "noEdition": "No active giveaway right now",
+    "noEditionSub": "Come back soon or subscribe to the channel to stay updated!"
+  },
+  "countdown": {
+    "title": "Draw in",
+    "days": "Days",
+    "hours": "Hours",
+    "minutes": "Minutes",
+    "seconds": "Seconds",
+    "ended": "The draw has taken place!"
+  },
+  "form": {
+    "title": "Enter the Giveaway",
+    "subtitle": "100% free — 1 entry per person",
+    "email": "Email address",
+    "emailPlaceholder": "your@email.com",
+    "roblox": "Roblox username",
+    "robloxPlaceholder": "YourRobloxUsername",
+    "submit": "ENTER FOR FREE",
+    "submitting": "Registering...",
+    "success": "You're in! Good luck! 🐉",
+    "successSub": "A confirmation email has been sent.",
+    "errorEmail": "This email is already registered.",
+    "errorRoblox": "This Roblox username is already registered.",
+    "errorGeneric": "Something went wrong. Please try again.",
+    "rules": "By entering you accept the",
+    "rulesLink": "rules"
+  },
+  "how": {
+    "title": "How does it work?",
+    "step1Title": "Register",
+    "step1Desc": "Enter your email and Roblox username. It's free and takes seconds.",
+    "step2Title": "Wait for the draw",
+    "step2Desc": "On the announced date, a winner is randomly selected from all entries.",
+    "step3Title": "Win!",
+    "step3Desc": "The winner receives the brainrot directly in-game. Announced on YouTube!"
+  },
+  "prize": {
+    "title": "The Prize",
+    "edition": "Edition"
+  },
+  "winners": {
+    "title": "Previous Winners",
+    "subtitle": "The lucky winners of past editions",
+    "edition": "Edition",
+    "winner": "Winner",
+    "prize": "Prize",
+    "date": "Draw date",
+    "noWinners": "No draws have taken place yet."
+  },
+  "shop": {
+    "title": "Shop",
+    "subtitle": "Exclusive CIT products coming soon!",
+    "comingSoon": "UNDER CONSTRUCTION",
+    "notify": "Notify me"
+  },
+  "rulesSection": {
+    "title": "Rules",
+    "r1": "The giveaway is 100% free. No purchase is necessary to participate.",
+    "r2": "One entry per person (unique email and Roblox username).",
+    "r3": "The winner is randomly selected from all entries on the announced date.",
+    "r4bold": "If you win, your Roblox username will be publicly displayed on this site and potentially announced on the CIT YouTube channel.",
+    "r4end": "By participating, you accept this condition.",
+    "r5": "CIT reserves the right to cancel or modify the giveaway in case of force majeure.",
+    "r6": "The prize (in-game brainrot) will be delivered directly via Roblox. CIT is not responsible for any game limitations.",
+    "r7": "Any attempt at fraud (fake accounts, bots, etc.) results in immediate disqualification.",
+    "organizer": "Organizer: CIT (@CITlevrai) — YouTube 732k subscribers."
+  },
+  "footer": {
+    "rights": "All rights reserved",
+    "youtube": "YouTube Channel",
+    "discord": "Discord",
+    "rules": "Rules"
+  },
+  "admin": {
+    "login": {
+      "title": "Admin Login",
+      "password": "Password",
+      "submit": "Sign in",
+      "error": "Incorrect password"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "currentEdition": "Current Edition",
+      "totalEntries": "Participants",
+      "drawDate": "Draw Date",
+      "endDate": "End Date",
+      "noEdition": "No active edition",
+      "createEdition": "Create Edition",
+      "manageEntries": "View Entries",
+      "launchDraw": "Launch Draw",
+      "logout": "Logout"
+    },
+    "edition": {
+      "createTitle": "New Edition",
+      "titleFr": "Title (French)",
+      "titleEn": "Title (English)",
+      "titleEs": "Title (Spanish)",
+      "prizeName": "Prize name",
+      "prizeImage": "Prize image URL",
+      "endDate": "Registration end date",
+      "drawDate": "Draw date",
+      "create": "Create edition",
+      "success": "Edition created!"
+    },
+    "entries": {
+      "title": "Participants",
+      "email": "Email",
+      "roblox": "Roblox Username",
+      "date": "Registered on",
+      "total": "Total",
+      "export": "Export CSV",
+      "noEntries": "No participants yet."
+    },
+    "draw": {
+      "title": "Draw",
+      "subtitle": "Click to launch the official draw",
+      "launch": "LAUNCH DRAW",
+      "winner": "WINNER",
+      "noEntries": "No participants registered.",
+      "alreadyDrawn": "A winner has already been drawn for this edition.",
+      "confirm": "Confirm draw?",
+      "confirmText": "This action cannot be undone.",
+      "yes": "Yes, go!",
+      "cancel": "Cancel"
+    }
+  }
+}

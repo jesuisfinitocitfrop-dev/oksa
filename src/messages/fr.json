@@ -1,0 +1,144 @@
+{
+  "nav": {
+    "home": "Accueil",
+    "tombola": "Tombola",
+    "winners": "Gagnants",
+    "shop": "Boutique",
+    "admin": "Admin"
+  },
+  "hero": {
+    "badge": "GIVEAWAY GRATUIT",
+    "title": "GAGNE LE",
+    "titleHighlight": "DRAGON DORÉ",
+    "subtitle": "Inscris-toi gratuitement et tente ta chance pour remporter ce brainrot légendaire dans Steal a Brainrot !",
+    "cta": "PARTICIPER MAINTENANT",
+    "watchYoutube": "Voir la chaîne",
+    "participants": "participants inscrits",
+    "noEdition": "Aucun giveaway actif pour le moment",
+    "noEditionSub": "Reviens bientôt ou abonne-toi à la chaîne pour ne rien rater !"
+  },
+  "countdown": {
+    "title": "Tirage dans",
+    "days": "Jours",
+    "hours": "Heures",
+    "minutes": "Minutes",
+    "seconds": "Secondes",
+    "ended": "Le tirage a eu lieu !"
+  },
+  "form": {
+    "title": "S'inscrire au Giveaway",
+    "subtitle": "Inscription 100% gratuite — 1 seule participation par personne",
+    "email": "Adresse email",
+    "emailPlaceholder": "ton@email.com",
+    "roblox": "Pseudo Roblox",
+    "robloxPlaceholder": "TonPseudoRoblox",
+    "submit": "PARTICIPER GRATUITEMENT",
+    "submitting": "Inscription en cours...",
+    "success": "Tu es inscrit ! Bonne chance ! 🐉",
+    "successSub": "Un email de confirmation t'a été envoyé.",
+    "errorEmail": "Cet email est déjà inscrit.",
+    "errorRoblox": "Ce pseudo Roblox est déjà inscrit.",
+    "errorGeneric": "Une erreur s'est produite. Réessaie.",
+    "rules": "En participant tu acceptes le",
+    "rulesLink": "règlement"
+  },
+  "how": {
+    "title": "Comment ça marche ?",
+    "step1Title": "Inscris-toi",
+    "step1Desc": "Entre ton email et ton pseudo Roblox. C'est gratuit et rapide.",
+    "step2Title": "Attends le tirage",
+    "step2Desc": "À la date indiquée, un gagnant est tiré au sort parmi tous les inscrits.",
+    "step3Title": "Gagne !",
+    "step3Desc": "Le gagnant reçoit le brainrot directement en jeu. Annonce sur YouTube !"
+  },
+  "prize": {
+    "title": "Le Prix",
+    "edition": "Édition"
+  },
+  "winners": {
+    "title": "Gagnants Précédents",
+    "subtitle": "Les heureux élus des éditions passées",
+    "edition": "Édition",
+    "winner": "Gagnant",
+    "prize": "Prix",
+    "date": "Date du tirage",
+    "noWinners": "Aucun tirage effectué pour le moment."
+  },
+  "shop": {
+    "title": "Boutique",
+    "subtitle": "Des produits exclusifs CIT arrivent bientôt !",
+    "comingSoon": "EN TRAVAUX",
+    "notify": "Me notifier"
+  },
+  "rulesSection": {
+    "title": "Règlement",
+    "r1": "Le giveaway est 100% gratuit. Aucun achat n'est nécessaire pour participer.",
+    "r2": "Une seule participation par personne (email et pseudo Roblox uniques).",
+    "r3": "Le gagnant est tiré au sort aléatoirement parmi tous les inscrits à la date indiquée.",
+    "r4bold": "En cas de victoire, le pseudo Roblox du gagnant sera publié publiquement sur ce site et potentiellement annoncé sur la chaîne YouTube CIT.",
+    "r4end": "En participant, tu acceptes cette condition.",
+    "r5": "CIT se réserve le droit d'annuler ou de modifier le giveaway en cas de force majeure.",
+    "r6": "Le prix (brainrot in-game) sera remis directement via Roblox. CIT n'est pas responsable des éventuelles limitations du jeu.",
+    "r7": "Toute tentative de fraude (faux comptes, bots, etc.) entraîne une disqualification immédiate.",
+    "organizer": "Organisateur : CIT (@CITlevrai) — YouTube 732k abonnés."
+  },
+  "footer": {
+    "rights": "Tous droits réservés",
+    "youtube": "Chaîne YouTube",
+    "discord": "Discord",
+    "rules": "Règlement"
+  },
+  "admin": {
+    "login": {
+      "title": "Connexion Admin",
+      "password": "Mot de passe",
+      "submit": "Se connecter",
+      "error": "Mot de passe incorrect"
+    },
+    "dashboard": {
+      "title": "Dashboard",
+      "currentEdition": "Édition actuelle",
+      "totalEntries": "Participants",
+      "drawDate": "Date du tirage",
+      "endDate": "Date de fin",
+      "noEdition": "Aucune édition active",
+      "createEdition": "Créer une édition",
+      "manageEntries": "Voir les inscrits",
+      "launchDraw": "Lancer le tirage",
+      "logout": "Déconnexion"
+    },
+    "edition": {
+      "createTitle": "Nouvelle Édition",
+      "titleFr": "Titre (Français)",
+      "titleEn": "Titre (Anglais)",
+      "titleEs": "Titre (Espagnol)",
+      "prizeName": "Nom du prix",
+      "prizeImage": "URL de l'image du prix",
+      "endDate": "Date de fin des inscriptions",
+      "drawDate": "Date du tirage",
+      "create": "Créer l'édition",
+      "success": "Édition créée !"
+    },
+    "entries": {
+      "title": "Participants",
+      "email": "Email",
+      "roblox": "Pseudo Roblox",
+      "date": "Inscrit le",
+      "total": "Total",
+      "export": "Exporter CSV",
+      "noEntries": "Aucun participant pour le moment."
+    },
+    "draw": {
+      "title": "Tirage au Sort",
+      "subtitle": "Clique pour lancer le tirage officiel",
+      "launch": "LANCER LE TIRAGE",
+      "winner": "GAGNANT",
+      "noEntries": "Aucun participant enregistré.",
+      "alreadyDrawn": "Un gagnant a déjà été tiré pour cette édition.",
+      "confirm": "Confirmer le tirage ?",
+      "confirmText": "Cette action est irréversible.",
+      "yes": "Oui, lancer !",
+      "cancel": "Annuler"
+    }
+  }
+}
