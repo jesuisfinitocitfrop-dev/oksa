@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import './[locale]/globals.css'
+import { Analytics } from '@vercel/analytics/next'
 
 export const metadata: Metadata = {
   title: 'CITgive — Giveaway Steal a Brainrot',
@@ -17,6 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body suppressHydrationWarning className="bg-cit-dark text-white font-inter antialiased">
         {children}
+        <Analytics />
       </body>
     </html>
   )
