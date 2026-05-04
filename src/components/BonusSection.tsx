@@ -262,7 +262,10 @@ export default function BonusSection({
         </button>
 
         <p className="text-xs text-gray-600 text-center mt-2">
-          Paiement sécurisé Stripe • Visa / Mastercard / CB
+          Paiement sécurisé Stripe • Visa / Mastercard / CB •{' '}
+          <a href="/cgv" target="_blank" className="underline hover:text-gray-400 transition-colors">
+            Aucune récompense garantie — CGV
+          </a>
         </p>
       </div>
     </div>
