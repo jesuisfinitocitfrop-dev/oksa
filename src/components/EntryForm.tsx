@@ -5,7 +5,7 @@ import { useTranslations } from 'next-intl'
 import RulesModal from './RulesModal'
 import BonusSection from './BonusSection'
 
-type Status = 'idle' | 'loading' | 'success' | 'error'
+type Status = 'idle' | 'loading' | 'success' | 'error' | 'returning'
 
 export default function EntryForm({
   editionId,
@@ -22,12 +22,43 @@ export default function EntryForm({
   const [entryId, setEntryId] = useState('')
   const [referralToken, setReferralToken] = useState('')
   const [ref, setRef] = useState('')
+  const [paymentSuccess, setPaymentSuccess] = useState(false)
 
-  // Read ?ref= from URL on mount
+  // Detect return from Stripe or referral link
   useEffect(() => {
     const params = new URLSearchParams(window.location.search)
     const r = params.get('ref')
+    const pmtStatus = params.get('payment')
+    const pmtEntryId = params.get('entry_id')
+
     if (r) setRef(r)
+
+    // Returning from Stripe payment — restore bonus section
+    if (pmtStatus === 'success' && pmtEntryId) {
+      setStatus('returning')
+      setPaymentSuccess(true)
+      fetch(`/api/entry?entry_id=${pmtEntryId}`)
+        .then(r => r.json())
+        .then(data => {
+          if (data.entry_id) {
+            setEntryId(data.entry_id)
+            setReferralToken(data.referral_token ?? '')
+            setStatus('success')
+            // Clean URL without reloading
+            window.history.replaceState({}, '', window.location.pathname)
+            setTimeout(() => {
+              document.getElementById('bonus-section')?.scrollIntoView({ behavior: 'smooth' })
+            }, 200)
+          } else {
+            setStatus('idle')
+          }
+        })
+        .catch(() => setStatus('idle'))
+    }
+
+    if (pmtStatus === 'cancelled') {
+      window.history.replaceState({}, '', window.location.pathname)
+    }
   }, [])
 
   async function handleSubmit(e: React.FormEvent) {
@@ -54,7 +85,6 @@ export default function EntryForm({
         setEntryId(data.entry_id)
         setReferralToken(data.referral_token)
         setStatus('success')
-        // Scroll to bonus section
         setTimeout(() => {
           document.getElementById('bonus-section')?.scrollIntoView({ behavior: 'smooth' })
         }, 100)
@@ -65,23 +95,30 @@ export default function EntryForm({
     }
   }
 
+  if (status === 'returning') {
+    return (
+      <div className="text-center py-8 animate-pulse text-gray-400 text-sm">
+        Chargement de ton profil...
+      </div>
+    )
+  }
+
   if (status === 'success') {
     return (
       <div className="space-y-6">
-        {/* Confirmation */}
         <div className="text-center py-4 animate-scale-in">
           <div className="text-5xl mb-3">🐉</div>
           <h3 className="font-bangers text-3xl text-gold-400 mb-1">{t('success')}</h3>
           <p className="text-gray-400 text-sm">{t('successSub')}</p>
         </div>
 
-        {/* Bonus section */}
         <div id="bonus-section">
           <BonusSection
             editionId={editionId}
             entryId={entryId}
             referralToken={referralToken}
             locale={locale}
+            paymentSuccess={paymentSuccess}
           />
         </div>
       </div>
@@ -129,17 +166,12 @@ export default function EntryForm({
         disabled={status === 'loading'}
         className="btn-fire w-full rounded-xl px-6 py-4 font-bangers text-xl text-cit-dark tracking-wider disabled:opacity-60 disabled:cursor-not-allowed"
       >
-        <span>
-          {status === 'loading' ? t('submitting') : t('submit')}
-        </span>
+        <span>{status === 'loading' ? t('submitting') : t('submit')}</span>
       </button>
 
       <p className="text-xs text-gray-600 text-center">
         {t('rules')}{' '}
-        <RulesModal
-          className="text-gold-400 hover:underline"
-          label={t('rulesLink')}
-        />
+        <RulesModal className="text-gold-400 hover:underline" label={t('rulesLink')} />
       </p>
     </form>
   )

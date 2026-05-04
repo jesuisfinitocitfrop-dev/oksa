@@ -17,11 +17,13 @@ export default function BonusSection({
   entryId,
   referralToken,
   locale,
+  paymentSuccess = false,
 }: {
   editionId: string
   entryId: string
   referralToken: string
   locale: string
+  paymentSuccess?: boolean
 }) {
   const [actions, setActions] = useState<BonusAction[]>([])
   const [completedIds, setCompletedIds] = useState<string[]>([])
@@ -96,6 +98,20 @@ export default function BonusSection({
 
   return (
     <div className="space-y-6 animate-slide-in">
+
+      {/* Confirmation paiement */}
+      {paymentSuccess && (
+        <div className="bg-gradient-to-r from-purple-500/20 to-indigo-500/20 border border-purple-500/40 rounded-xl px-5 py-4 flex items-center gap-4">
+          <span className="text-3xl shrink-0">💎</span>
+          <div>
+            <p className="font-bold text-purple-300 text-base">Paiement reçu — Badge Supporter activé !</p>
+            <p className="text-gray-400 text-xs mt-0.5">
+              Tes chances ont été mises à jour. Tu apparais maintenant dans la section Supporters sur la page principale.
+            </p>
+          </div>
+        </div>
+      )}
+
       {/* Header */}
       <div className="text-center">
         <div className="inline-flex items-center gap-2 bg-gold-400/10 border border-gold-400/30 rounded-full px-4 py-1.5 mb-3">
