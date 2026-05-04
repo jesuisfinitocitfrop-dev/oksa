@@ -11,17 +11,13 @@ export default function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
-  // With localePrefix: 'as-needed', French paths have no prefix:
-  //   /admin/dashboard  → French admin
-  //   /en/admin/dashboard → English admin
-  // Include fr prefix too so /fr/admin/* redirects to login before next-intl rewrites it
-  const isAdminPath = pathname.match(/^\/(?:(fr|en|es)\/)?admin(?!\/login)(?:\/|$)/)
+  // Protect admin routes (localePrefix: 'always' → /fr/admin, /en/admin, /es/admin)
+  const isAdminPath = pathname.match(/^\/(fr|en|es)\/admin(?!\/login)(?:\/|$)/)
   if (isAdminPath) {
     const session = request.cookies.get('citgive-admin-session')
     if (!session?.value) {
-      const locale = isAdminPath[1] ?? 'fr'
-      const loginPath = locale === 'fr' ? '/admin/login' : `/${locale}/admin/login`
-      return NextResponse.redirect(new URL(loginPath, request.url))
+      const locale = isAdminPath[1]
+      return NextResponse.redirect(new URL(`/${locale}/admin/login`, request.url))
     }
   }
 
