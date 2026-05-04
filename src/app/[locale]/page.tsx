@@ -1,6 +1,6 @@
 import { getTranslations, setRequestLocale } from 'next-intl/server'
 import Image from 'next/image'
-import { supabase, isSupabaseConfigured } from '@/lib/supabase'
+import { supabase, isSupabaseConfigured, getServiceClient } from '@/lib/supabase'
 import Navbar from '@/components/Navbar'
 import FireParticles from '@/components/FireParticles'
 import CountdownTimer from '@/components/CountdownTimer'
@@ -8,6 +8,7 @@ import ParticipantCounter from '@/components/ParticipantCounter'
 import EntryForm from '@/components/EntryForm'
 import RulesModal from '@/components/RulesModal'
 import TungTungGame from '@/components/TungTungGame'
+import { SupporterBadge } from '@/components/SupportersBadge'
 import { Link } from '@/navigation'
 
 async function getActiveEdition() {
@@ -40,6 +41,26 @@ async function getEntryCount(editionId: string) {
   }
 }
 
+async function getSupporters(editionId: string) {
+  if (!isSupabaseConfigured) return []
+  try {
+    const db = getServiceClient()
+    const { data } = await db
+      .from('payments')
+      .select('amount_eur, entries(roblox_username)')
+      .eq('edition_id', editionId)
+      .eq('status', 'completed')
+      .order('created_at', { ascending: false })
+      .limit(20)
+    return (data ?? []).map((p: any) => ({
+      roblox_username: p.entries?.roblox_username ?? '???',
+      amount_eur: p.amount_eur,
+    }))
+  } catch {
+    return []
+  }
+}
+
 async function getPastWinners() {
   if (!isSupabaseConfigured) return []
   try {
@@ -68,6 +89,7 @@ export default async function HomePage({
   const edition = await getActiveEdition()
   const entryCount = edition ? await getEntryCount(edition.id) : 0
   const pastWinners = await getPastWinners()
+  const supporters = edition ? await getSupporters(edition.id) : []
 
   const editionTitle =
     locale === 'en' ? edition?.title_en :
@@ -239,7 +261,12 @@ export default async function HomePage({
                   <div className="flex items-center gap-3 md:gap-4 min-w-0">
                     <span className="text-xl md:text-2xl shrink-0">🏆</span>
                     <div className="min-w-0">
-                      <p className="font-bold text-gold-400 truncate">{w.entries?.roblox_username}</p>
+                      <div className="flex items-center gap-2 flex-wrap">
+                        <p className="font-bold text-gold-400 truncate">{w.entries?.roblox_username}</p>
+                        {(w.entries?.chances ?? 1) > 2 && (
+                          <SupporterBadge amount={0} />
+                        )}
+                      </div>
                       <p className="text-gray-500 text-xs md:text-sm truncate">{w.editions?.prize_name}</p>
                     </div>
                   </div>
@@ -249,6 +276,33 @@ export default async function HomePage({
                       { day: 'numeric', month: 'short', year: 'numeric' }
                     )}
                   </p>
+                </div>
+              ))}
+            </div>
+          </div>
+        </section>
+      )}
+
+      {/* ── SUPPORTERS ───────────────────────────────────── */}
+      {supporters.length > 0 && (
+        <section className="relative z-10 py-12 md:py-16 px-4">
+          <div className="max-w-4xl mx-auto">
+            <h2 className="font-bangers text-4xl md:text-5xl text-center text-white mb-2">
+              💎 SUPPORTERS
+            </h2>
+            <p className="text-gray-400 text-center text-sm mb-8">
+              Ces joueurs ont boosté leurs chances et soutenu CIT
+            </p>
+            <div className="flex flex-wrap gap-3 justify-center">
+              {supporters.map((s: any, i: number) => (
+                <div
+                  key={i}
+                  className="flex items-center gap-2 bg-gradient-to-r from-purple-500/10 to-indigo-500/10 border border-purple-500/30 rounded-full px-4 py-2"
+                >
+                  <span className="text-purple-300 font-bold text-sm">{s.roblox_username}</span>
+                  <span className="text-xs bg-purple-500/20 text-purple-300 border border-purple-500/30 px-2 py-0.5 rounded-full font-bold">
+                    💎 {s.amount_eur}€
+                  </span>
                 </div>
               ))}
             </div>

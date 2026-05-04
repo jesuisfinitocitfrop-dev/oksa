@@ -211,7 +211,10 @@ export default function BonusSection({
           <span className="text-2xl">💎</span>
           <div>
             <p className="font-bold text-white text-sm">Boost de chances — 1€ = +100 chances</p>
-            <p className="text-gray-500 text-xs">Multiplie massivement tes chances de gagner</p>
+            <p className="text-gray-500 text-xs">
+              Multiplie tes chances + obtiens le badge{' '}
+              <span className="text-purple-300 font-bold">💎 Supporter</span> affiché publiquement si tu gagnes
+            </p>
           </div>
         </div>
 

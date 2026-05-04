@@ -2,6 +2,7 @@ import { getTranslations, setRequestLocale } from 'next-intl/server'
 import { supabase, getServiceClient } from '@/lib/supabase'
 import Navbar from '@/components/Navbar'
 import FireParticles from '@/components/FireParticles'
+import { SupporterBadge } from '@/components/SupportersBadge'
 
 async function getWinners() {
   const db = getServiceClient()
@@ -88,7 +89,10 @@ export default async function WinnersPage({
                           <span className="font-bangers text-gold-400 text-xl">#{i + 1}</span>
                         </div>
                         <div>
-                          <p className="font-bangers text-2xl text-gold-400">{w.entries?.roblox_username}</p>
+                          <div className="flex items-center gap-2 flex-wrap">
+                            <p className="font-bangers text-2xl text-gold-400">{w.entries?.roblox_username}</p>
+                            {totalPaid > 0 && <SupporterBadge amount={totalPaid} />}
+                          </div>
                           <p className="text-gray-500 text-sm">{editionTitle} — {w.editions?.prize_name}</p>
                         </div>
                       </div>
