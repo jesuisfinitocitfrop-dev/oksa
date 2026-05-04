@@ -219,7 +219,7 @@ export default function BonusSection({
         </div>
 
         <div className="grid grid-cols-4 gap-2 mb-3">
-          {[1, 5, 10, 20].map(v => (
+          {[5, 20, 50, 100].map(v => (
             <button
               key={v}
               onClick={() => setAmount(v)}
@@ -238,7 +238,7 @@ export default function BonusSection({
           <input
             type="range"
             min={1}
-            max={20}
+            max={100}
             value={amount}
             onChange={e => setAmount(Number(e.target.value))}
             className="flex-1 accent-yellow-400"

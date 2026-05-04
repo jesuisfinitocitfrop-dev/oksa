@@ -11,8 +11,8 @@ export async function POST(request: NextRequest) {
   }
 
   const amount = Math.floor(Number(amount_eur))
-  if (amount < 1 || amount > 20) {
-    return NextResponse.json({ error: 'Amount must be between 1 and 20' }, { status: 400 })
+  if (amount < 1 || amount > 100) {
+    return NextResponse.json({ error: 'Amount must be between 1 and 100' }, { status: 400 })
   }
 
   const db = getServiceClient()
