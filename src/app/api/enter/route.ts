@@ -57,7 +57,10 @@ export async function POST(request: NextRequest) {
 
   const referral_token = randomBytes(16).toString('hex')
 
-  const { data: inserted, error: insertError } = await db
+  // Try inserting with new columns first, fall back to basic insert if migration not yet run
+  let inserted: { id: string } | null = null
+
+  const { data: insertedFull, error: insertErrorFull } = await db
     .from('entries')
     .insert({
       edition_id,
@@ -69,26 +72,44 @@ export async function POST(request: NextRequest) {
     .select('id')
     .single()
 
-  if (insertError || !inserted) {
-    console.error('Insert error:', insertError)
-    return NextResponse.json({ error: 'Failed to register' }, { status: 500 })
-  }
-
-  // If someone referred this new participant, give referrer +3 chances
-  if (ref && typeof ref === 'string') {
-    const { data: referrer } = await db
+  if (insertErrorFull) {
+    // Fallback: insert without new columns (migration not yet applied)
+    const { data: insertedBasic, error: insertErrorBasic } = await db
       .from('entries')
-      .select('id, chances')
-      .eq('edition_id', edition_id)
-      .eq('referral_token', ref)
+      .insert({
+        edition_id,
+        email: email.toLowerCase(),
+        roblox_username,
+      })
+      .select('id')
       .single()
 
-    if (referrer) {
-      await db
-        .from('entries')
-        .update({ chances: referrer.chances + 3 })
-        .eq('id', referrer.id)
+    if (insertErrorBasic || !insertedBasic) {
+      console.error('Insert error:', insertErrorBasic)
+      return NextResponse.json({ error: 'Failed to register' }, { status: 500 })
     }
+    inserted = insertedBasic
+  } else {
+    inserted = insertedFull
+  }
+
+  // Give referrer +3 chances (only if migration applied)
+  if (ref && typeof ref === 'string') {
+    try {
+      const { data: referrer } = await db
+        .from('entries')
+        .select('id, chances')
+        .eq('edition_id', edition_id)
+        .eq('referral_token', ref)
+        .single()
+
+      if (referrer) {
+        await db
+          .from('entries')
+          .update({ chances: referrer.chances + 3 })
+          .eq('id', referrer.id)
+      }
+    } catch { /* ignore if migration not applied */ }
   }
 
   try {
@@ -105,7 +126,7 @@ export async function POST(request: NextRequest) {
 
   return NextResponse.json({
     success: true,
-    entry_id: inserted.id,
+    entry_id: inserted!.id,
     referral_token,
   })
 }
