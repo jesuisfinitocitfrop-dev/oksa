@@ -6,7 +6,7 @@ export const metadata: Metadata = {
   title: 'CITgive — Giveaway Steal a Brainrot',
   description: 'Participe gratuitement au giveaway CIT et gagne des brainrots légendaires dans Steal a Brainrot !',
   icons: {
-    icon: '/images/logo.png',
+    icon: '/images/favicon.png',
   },
 }
 
@@ -18,7 +18,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           href="https://fonts.googleapis.com/css2?family=Bangers&family=Inter:wght@400;500;600;700&display=swap"
           rel="stylesheet"
         />
-        <link rel="icon" href="/images/logo.png" />
+        <link rel="icon" href="/images/favicon.png" />
       </head>
       <body suppressHydrationWarning className="bg-cit-dark text-white font-inter antialiased">
         {children}

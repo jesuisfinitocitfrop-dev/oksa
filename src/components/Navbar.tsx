@@ -61,7 +61,7 @@ export default function Navbar({ locale }: { locale: string }) {
         {/* Logo */}
         <Link href={`/${locale}`} className="flex items-center gap-2 shrink-0 group">
           <Image
-            src="/images/logo.png"
+            src="/images/favicon.png"
             alt="CITgive"
             width={36}
             height={36}
