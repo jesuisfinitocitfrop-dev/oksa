@@ -71,8 +71,6 @@ export default async function HomePage({
   const edition = await getActiveEdition()
   const entryCount = edition ? await getEntryCount(edition.id) : 0
   const pastWinners = await getPastWinners()
-  const supporters = edition ? await getSupporters(edition.id) : []
-
   const editionTitle =
     locale === 'en' ? edition?.title_en :
     locale === 'es' ? edition?.title_es :
