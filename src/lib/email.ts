@@ -27,6 +27,11 @@ export async function sendConfirmationEmail(
           <p style="color:#FF6B00;font-size:18px;font-weight:bold;margin:0;">${new Date(drawDate).toLocaleDateString('fr-FR', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
         </div>
         <p style="color:#aaa;font-size:14px;">Bonne chance ! Le gagnant sera annoncé sur <a href="https://youtube.com/@CITlevrai" style="color:#FFD700;">la chaîne YouTube CIT</a>.</p>
+        <div style="background:#12121A;border:1px solid #2a2a3a;border-radius:8px;padding:20px;margin:24px 0;text-align:center;">
+          <p style="color:#ffffff;font-size:15px;font-weight:bold;margin:0 0 6px;">🎮 Achète tes jeux moins cher</p>
+          <p style="color:#aaa;font-size:13px;margin:0 0 14px;">Instant Gaming — jusqu'à -90% sur les jeux PC</p>
+          <a href="https://www.instant-gaming.com/?igr=CITgive" style="display:inline-block;background:linear-gradient(135deg,#FFD700,#FF6B00);color:#0A0A0F;font-weight:bold;font-size:14px;padding:10px 24px;border-radius:8px;text-decoration:none;">Voir les offres →</a>
+        </div>
         <p style="color:#555;font-size:12px;margin-top:24px;">1 seule participation par personne. Toute tentative de triche entraînera une disqualification.</p>
       </div>
     `,
@@ -43,6 +48,11 @@ export async function sendConfirmationEmail(
           <p style="color:#FF6B00;font-size:18px;font-weight:bold;margin:0;">${new Date(drawDate).toLocaleDateString('en-US', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
         </div>
         <p style="color:#aaa;font-size:14px;">Good luck! The winner will be announced on <a href="https://youtube.com/@CITlevrai" style="color:#FFD700;">CIT's YouTube channel</a>.</p>
+        <div style="background:#12121A;border:1px solid #2a2a3a;border-radius:8px;padding:20px;margin:24px 0;text-align:center;">
+          <p style="color:#ffffff;font-size:15px;font-weight:bold;margin:0 0 6px;">🎮 Buy games cheaper</p>
+          <p style="color:#aaa;font-size:13px;margin:0 0 14px;">Instant Gaming — up to -90% on PC games</p>
+          <a href="https://www.instant-gaming.com/?igr=CITgive" style="display:inline-block;background:linear-gradient(135deg,#FFD700,#FF6B00);color:#0A0A0F;font-weight:bold;font-size:14px;padding:10px 24px;border-radius:8px;text-decoration:none;">See deals →</a>
+        </div>
         <p style="color:#555;font-size:12px;margin-top:24px;">1 entry per person. Any cheating attempt will result in disqualification.</p>
       </div>
     `,
@@ -59,6 +69,11 @@ export async function sendConfirmationEmail(
           <p style="color:#FF6B00;font-size:18px;font-weight:bold;margin:0;">${new Date(drawDate).toLocaleDateString('es-ES', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
         </div>
         <p style="color:#aaa;font-size:14px;">¡Buena suerte! El ganador se anunciará en <a href="https://youtube.com/@CITlevrai" style="color:#FFD700;">el canal YouTube de CIT</a>.</p>
+        <div style="background:#12121A;border:1px solid #2a2a3a;border-radius:8px;padding:20px;margin:24px 0;text-align:center;">
+          <p style="color:#ffffff;font-size:15px;font-weight:bold;margin:0 0 6px;">🎮 Compra juegos más barato</p>
+          <p style="color:#aaa;font-size:13px;margin:0 0 14px;">Instant Gaming — hasta -90% en juegos PC</p>
+          <a href="https://www.instant-gaming.com/?igr=CITgive" style="display:inline-block;background:linear-gradient(135deg,#FFD700,#FF6B00);color:#0A0A0F;font-weight:bold;font-size:14px;padding:10px 24px;border-radius:8px;text-decoration:none;">Ver ofertas →</a>
+        </div>
         <p style="color:#555;font-size:12px;margin-top:24px;">1 participación por persona. Cualquier intento de trampa resultará en descalificación.</p>
       </div>
     `,
