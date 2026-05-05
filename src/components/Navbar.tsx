@@ -52,6 +52,7 @@ export default function Navbar({ locale }: { locale: string }) {
     { href: `/${locale}`, label: t('home') },
     { href: `/${locale}/winners`, label: t('winners') },
     { href: `/${locale}/shop`, label: t('shop') },
+    { href: `/${locale}#supporters`, label: t('supporters') },
   ]
 
   return (

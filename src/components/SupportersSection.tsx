@@ -28,7 +28,7 @@ export default function SupportersSection({ editionId }: { editionId: string }) 
   if (supporters.length === 0) return null
 
   return (
-    <section className="relative z-10 py-12 md:py-16 px-4">
+    <section id="supporters" className="relative z-10 py-12 md:py-16 px-4">
       <div className="max-w-4xl mx-auto">
         <h2 className="font-bangers text-4xl md:text-5xl text-center text-white mb-2">
           💎 SUPPORTERS
