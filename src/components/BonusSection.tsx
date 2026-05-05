@@ -119,8 +119,7 @@ export default function BonusSection({
     setTimeout(() => setCopied(false), 2000)
   }
 
-  const hasCompletedAction = completedIds.length > 0
-  const isSupporter = totalPaid > 0 || hasCompletedAction
+  const isSupporter = totalPaid > 0
 
   if (loading) {
     return (

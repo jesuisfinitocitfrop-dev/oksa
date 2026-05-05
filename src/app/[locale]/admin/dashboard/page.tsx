@@ -67,6 +67,15 @@ export default function AdminDashboardPage() {
   const [editSaving, setEditSaving] = useState(false)
   const [editSuccess, setEditSuccess] = useState(false)
 
+  // Stats
+  const [stats, setStats] = useState<{
+    participants: number
+    youtube: number
+    discord: number
+    boosts_count: number
+    boosts_total: number
+  } | null>(null)
+
   // Bonus actions
   const [bonusActions, setBonusActions] = useState<BonusAction[]>([])
   const [showBonusForm, setShowBonusForm] = useState(false)
@@ -84,6 +93,7 @@ export default function AdminDashboardPage() {
     if (activeEdition) {
       fetchEntryCount(activeEdition.id)
       fetchBonusActions(activeEdition.id)
+      fetchStats(activeEdition.id)
     }
   }, [activeEdition?.id])
 
@@ -105,6 +115,14 @@ export default function AdminDashboardPage() {
     const res = await fetch(`/api/admin/bonus-actions?edition_id=${editionId}`)
     const data = await res.json()
     setBonusActions(data.actions ?? [])
+  }
+
+  async function fetchStats(editionId: string) {
+    const res = await fetch(`/api/admin/stats?edition_id=${editionId}`)
+    if (res.ok) {
+      const data = await res.json()
+      setStats(data)
+    }
   }
 
   async function handleLogout() {
@@ -252,6 +270,50 @@ export default function AdminDashboardPage() {
             {t('logout')}
           </button>
         </div>
+
+        {/* ── STATS DASHBOARD ───────────────────────────── */}
+        {activeEdition && stats && (
+          <div className="mb-8">
+            <h2 className="font-bangers text-2xl text-white mb-4">📊 Statistiques en direct</h2>
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3">
+              <div className="bg-cit-card border border-cit-border rounded-xl p-4">
+                <p className="text-gray-500 text-xs uppercase tracking-wider mb-1">👥 Participants</p>
+                <p className="font-bangers text-4xl text-gold-400">{stats.participants.toLocaleString()}</p>
+                <p className="text-gray-600 text-xs mt-1">inscrits à l'édition</p>
+              </div>
+              <div className="bg-cit-card border border-red-500/20 rounded-xl p-4">
+                <p className="text-gray-500 text-xs uppercase tracking-wider mb-1">📺 YouTube</p>
+                <p className="font-bangers text-4xl text-red-400">{stats.youtube.toLocaleString()}</p>
+                <p className="text-gray-600 text-xs mt-1">abonnements vérifiés</p>
+              </div>
+              <div className="bg-cit-card border border-indigo-500/20 rounded-xl p-4">
+                <p className="text-gray-500 text-xs uppercase tracking-wider mb-1">💬 Discord</p>
+                <p className="font-bangers text-4xl text-indigo-400">{stats.discord.toLocaleString()}</p>
+                <p className="text-gray-600 text-xs mt-1">membres rejoints</p>
+              </div>
+              <div className="bg-cit-card border border-purple-500/20 rounded-xl p-4">
+                <p className="text-gray-500 text-xs uppercase tracking-wider mb-1">💎 Boosts achetés</p>
+                <p className="font-bangers text-4xl text-purple-400">{stats.boosts_count.toLocaleString()}</p>
+                <p className="text-gray-600 text-xs mt-1">paiements complétés</p>
+              </div>
+              <div className="bg-cit-card border border-green-500/20 rounded-xl p-4">
+                <p className="text-gray-500 text-xs uppercase tracking-wider mb-1">💰 Revenus boosts</p>
+                <p className="font-bangers text-4xl text-green-400">{stats.boosts_total}€</p>
+                <p className="text-gray-600 text-xs mt-1">total collecté</p>
+              </div>
+              <a
+                href="https://vercel.com/analytics"
+                target="_blank"
+                rel="noopener noreferrer"
+                className="bg-cit-card border border-cit-border rounded-xl p-4 hover:border-white/30 transition-colors group"
+              >
+                <p className="text-gray-500 text-xs uppercase tracking-wider mb-1">🌐 Visiteurs</p>
+                <p className="font-bangers text-2xl text-white group-hover:text-gold-400 transition-colors">Vercel Analytics →</p>
+                <p className="text-gray-600 text-xs mt-1">voir les stats de visite</p>
+              </a>
+            </div>
+          </div>
+        )}
 
         {/* Active edition stats */}
         {activeEdition ? (
