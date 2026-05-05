@@ -51,7 +51,6 @@ export default function BonusSection({
   const [amount, setAmount] = useState(5)
   const [payLoading, setPayLoading] = useState(false)
   const [copied, setCopied] = useState(false)
-  const [youtubeStatus, setYoutubeStatus] = useState<'success' | 'not_subscribed' | 'error' | 'cancelled' | null>(null)
 
   const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://citgive.com'
   const referralUrl = `${siteUrl}?ref=${referralToken}`
@@ -67,35 +66,6 @@ export default function BonusSection({
         setLoading(false)
       })
   }, [editionId, entryId])
-
-  // Handle YouTube OAuth return
-  useEffect(() => {
-    if (typeof window === 'undefined') return
-    const params = new URLSearchParams(window.location.search)
-    const yt = params.get('youtube')
-    const actionId = params.get('action_id')
-
-    if (yt) {
-      setYoutubeStatus(yt as typeof youtubeStatus)
-      if (yt === 'success' && actionId) {
-        setCompletedIds(prev => prev.includes(actionId) ? prev : [...prev, actionId])
-        // Refresh chances from server
-        fetch(`/api/bonus/actions?edition_id=${editionId}&entry_id=${entryId}`)
-          .then(r => r.json())
-          .then(d => { if (d.totalChances) setTotalChances(d.totalChances) })
-      }
-      // Clean URL
-      const clean = new URL(window.location.href)
-      clean.searchParams.delete('youtube')
-      clean.searchParams.delete('action_id')
-      window.history.replaceState({}, '', clean.toString())
-    }
-  }, [editionId, entryId])
-
-  function handleYoutubeAction(action: BonusAction) {
-    const returnUrl = typeof window !== 'undefined' ? window.location.href : '/'
-    window.location.href = `/api/bonus/youtube/start?entry_id=${entryId}&action_id=${action.id}&return_url=${encodeURIComponent(returnUrl)}`
-  }
 
   async function handleComplete(actionId: string) {
     if (completedIds.includes(actionId) || pendingId === actionId) return
@@ -161,29 +131,6 @@ export default function BonusSection({
         </div>
       )}
 
-      {/* Confirmation abonnement YouTube */}
-      {youtubeStatus === 'success' && (
-        <div className="bg-gradient-to-r from-green-500/20 to-emerald-500/20 border border-green-500/40 rounded-xl px-5 py-4 flex items-center gap-4">
-          <span className="text-3xl shrink-0">✅</span>
-          <div>
-            <p className="font-bold text-green-300 text-base">Abonnement vérifié — Chances ajoutées !</p>
-            <p className="text-gray-400 text-xs mt-0.5">Merci de soutenir la chaîne CIT !</p>
-          </div>
-        </div>
-      )}
-
-      {youtubeStatus === 'not_subscribed' && (
-        <div className="bg-gradient-to-r from-red-500/20 to-orange-500/20 border border-red-500/40 rounded-xl px-5 py-4 flex items-center gap-4">
-          <span className="text-3xl shrink-0">⚠️</span>
-          <div>
-            <p className="font-bold text-red-300 text-base">Abonnement non détecté</p>
-            <p className="text-gray-400 text-xs mt-0.5">
-              Abonne-toi à la chaîne YouTube puis réessaie.
-            </p>
-          </div>
-        </div>
-      )}
-
       {/* Header avec badge */}
       <div className="text-center">
         <div className="inline-flex items-center gap-2 bg-gold-400/10 border border-gold-400/30 rounded-full px-4 py-1.5 mb-3">
@@ -221,13 +168,12 @@ export default function BonusSection({
                 }`}
               >
                 <div className="flex items-center gap-3 min-w-0">
-                  {action.action_type === 'discord' ? (
-                    <DiscordIcon className="w-7 h-7 text-indigo-400 shrink-0" />
-                  ) : action.action_type === 'youtube' ? (
-                    <YouTubeIcon className="w-7 h-7 text-red-500 shrink-0" />
-                  ) : (
-                    <span className="text-2xl shrink-0">{action.icon}</span>
-                  )}
+                  {action.action_type === 'discord'
+                    ? <DiscordIcon className="w-7 h-7 text-indigo-400 shrink-0" />
+                    : action.action_type === 'youtube'
+                    ? <YouTubeIcon className="w-7 h-7 text-red-500 shrink-0" />
+                    : <span className="text-2xl shrink-0">{action.icon}</span>
+                  }
                   <div className="min-w-0">
                     <p className={`font-bold text-sm ${done ? 'text-green-400' : 'text-white'}`}>
                       {action.label}
@@ -241,28 +187,24 @@ export default function BonusSection({
                   <span className={`font-bangers text-lg ${done ? 'text-green-400' : 'text-gold-400'}`}>
                     {done ? '✓' : `+${action.bonus_chances}`}
                   </span>
-                  {!done && isYoutube && (
-                    <button
-                      onClick={() => handleYoutubeAction(action)}
-                      className="bg-red-600 hover:bg-red-500 text-white text-xs font-bold px-3 py-1.5 rounded-lg transition-colors"
+                  {!done && action.url && (
+                    <a
+                      href={action.url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setTimeout(() => handleComplete(action.id), 3000)}
+                      className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors ${
+                        isYoutube
+                          ? 'bg-red-600 hover:bg-red-500 text-white'
+                          : action.action_type === 'discord'
+                          ? 'bg-indigo-600 hover:bg-indigo-500 text-white'
+                          : 'bg-gold-400 hover:bg-gold-300 text-cit-dark'
+                      }`}
                     >
-                      S&apos;abonner
-                    </button>
+                      {isYoutube ? "S'abonner" : 'Rejoindre'}
+                    </a>
                   )}
-                  {!done && !isYoutube && action.url && (
-                    <>
-                      <a
-                        href={action.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={() => setTimeout(() => handleComplete(action.id), 3000)}
-                        className="bg-gold-400 text-cit-dark text-xs font-bold px-3 py-1.5 rounded-lg hover:bg-gold-300 transition-colors"
-                      >
-                        Rejoindre
-                      </a>
-                    </>
-                  )}
-                  {!done && !isYoutube && !action.url && (
+                  {!done && !action.url && (
                     <button
                       onClick={() => handleComplete(action.id)}
                       disabled={pending}
