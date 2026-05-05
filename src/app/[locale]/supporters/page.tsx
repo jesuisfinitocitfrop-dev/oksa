@@ -157,7 +157,7 @@ export default async function SupportersPage({
           </p>
           <Link
             href={`/${locale}#inscription`}
-            className="btn-fire inline-block rounded-xl px-8 py-4 font-bangers text-xl text-cit-dark"
+            className="btn-fire inline-block w-full sm:w-auto rounded-xl px-8 py-4 font-bangers text-xl text-cit-dark"
           >
             SUPPORTER MAINTENANT →
           </Link>
