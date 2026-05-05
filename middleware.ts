@@ -11,6 +11,11 @@ export default function middleware(request: NextRequest) {
     return NextResponse.next()
   }
 
+  // Redirect bare /supporters to /fr/supporters
+  if (pathname === '/supporters') {
+    return NextResponse.redirect(new URL('/fr/supporters', request.url))
+  }
+
   // Protect admin routes (localePrefix: 'always' → /fr/admin, /en/admin, /es/admin)
   const isAdminPath = pathname.match(/^\/(fr|en|es)\/admin(?!\/login)(?:\/|$)/)
   if (isAdminPath) {
