@@ -66,7 +66,7 @@ export async function POST(request: NextRequest) {
       edition_id,
       email: email.toLowerCase(),
       roblox_username,
-      chances: 2,
+      chances: 1,
       referral_token,
     })
     .select('id')

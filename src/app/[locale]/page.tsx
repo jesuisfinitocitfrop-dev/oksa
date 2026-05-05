@@ -243,7 +243,7 @@ export default async function HomePage({
                     <div className="min-w-0">
                       <div className="flex items-center gap-2 flex-wrap">
                         <p className="font-bold text-gold-400 truncate">{w.entries?.roblox_username}</p>
-                        {(w.entries?.chances ?? 1) > 2 && (
+                        {(w.entries?.chances ?? 1) > 1 && (
                           <SupporterBadge amount={0} />
                         )}
                       </div>

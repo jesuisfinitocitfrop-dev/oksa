@@ -24,7 +24,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     entry_id: data.id,
     referral_token: data.referral_token ?? '',
-    chances: data.chances ?? 2,
+    chances: data.chances ?? 1,
     edition_id: data.edition_id,
   })
 }
