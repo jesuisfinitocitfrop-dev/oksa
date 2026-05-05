@@ -10,6 +10,7 @@ import RulesModal from '@/components/RulesModal'
 import TungTungGame from '@/components/TungTungGame'
 import { SupporterBadge } from '@/components/SupportersBadge'
 import SupportersSection from '@/components/SupportersSection'
+import EzoicAd from '@/components/EzoicAd'
 import { Link } from '@/navigation'
 
 async function getActiveEdition() {
@@ -204,6 +205,9 @@ export default async function HomePage({
         </section>
       )}
 
+      {/* ── PUB 101 — entre hero/form et "comment ça marche" ── */}
+      <EzoicAd id={101} className="relative z-10 flex justify-center py-4 px-4" />
+
       {/* ── HOW IT WORKS ──────────────────────────────────── */}
       <section className="relative z-10 py-12 md:py-20 px-4">
         <div className="max-w-5xl mx-auto">
@@ -226,6 +230,9 @@ export default async function HomePage({
           </div>
         </div>
       </section>
+
+      {/* ── PUB 102 — entre "comment ça marche" et winners ── */}
+      <EzoicAd id={102} className="relative z-10 flex justify-center py-4 px-4" />
 
       {/* ── PAST WINNERS ──────────────────────────────────── */}
       {pastWinners.length > 0 && (

@@ -3,6 +3,7 @@ import { supabase, getServiceClient } from '@/lib/supabase'
 import Navbar from '@/components/Navbar'
 import FireParticles from '@/components/FireParticles'
 import { SupporterBadge } from '@/components/SupportersBadge'
+import EzoicAd from '@/components/EzoicAd'
 
 async function getWinners() {
   const db = getServiceClient()
@@ -63,6 +64,9 @@ export default async function WinnersPage({
             </h1>
             <p className="text-gray-400">{t('subtitle')}</p>
           </div>
+
+          {/* ── PUB 103 — sous le titre, avant la liste ── */}
+          <EzoicAd id={103} className="flex justify-center mb-8" />
 
           {winners.length === 0 ? (
             <div className="text-center py-20">

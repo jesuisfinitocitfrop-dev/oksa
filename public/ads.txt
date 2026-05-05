@@ -1,0 +1,3 @@
+# ads.txt — à compléter après validation Ezoic
+# Ezoic te fournira les lignes exactes à ajouter ici depuis ton dashboard
+# Exemple : ezoic.com, XXXXXXX, DIRECT
