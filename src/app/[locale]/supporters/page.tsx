@@ -156,7 +156,7 @@ export default async function SupportersPage({
             1€ = +100 chances de gagner • Apparais dans ce classement
           </p>
           <Link
-            href={`/${locale}`}
+            href={`/${locale}#inscription`}
             className="btn-fire inline-block rounded-xl px-8 py-4 font-bangers text-xl text-cit-dark"
           >
             SUPPORTER MAINTENANT →
