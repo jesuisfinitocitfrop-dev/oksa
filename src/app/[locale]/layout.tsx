@@ -7,7 +7,7 @@ import { routing } from '@/i18n/routing'
 export const metadata: Metadata = {
   title: 'CITgive — Giveaway Steal a Brainrot',
   description: 'Participe gratuitement au giveaway CIT et gagne des brainrots légendaires !',
-  icons: { icon: '/favicon.ico' },
+  icons: { icon: '/images/favicon.png' },
 }
 
 export default async function LocaleLayout({

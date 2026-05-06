@@ -60,7 +60,7 @@ export default function Navbar({ locale }: { locale: string }) {
       <div className="max-w-6xl mx-auto px-4 h-14 md:h-16 flex items-center justify-between gap-3">
 
         {/* Logo */}
-        <Link href={`/${locale}`} className="flex items-center gap-2 shrink-0 group">
+        <Link href={`/${locale}`} className="flex items-center gap-2 shrink-0">
           <Image
             src="/images/favicon.png"
             alt="CITgive"
@@ -69,9 +69,14 @@ export default function Navbar({ locale }: { locale: string }) {
             className="rounded-full"
             priority
           />
-          <span className="text-xl md:text-2xl font-bangers text-gold-400 tracking-wider group-hover:text-gold-300 transition-colors">
-            CIT<span className="text-fire-500">give</span>
-          </span>
+          <Image
+            src="/images/CITgivestraw.png"
+            alt="CITgive"
+            width={120}
+            height={40}
+            className="h-8 w-auto"
+            priority
+          />
         </Link>
 
         {/* Desktop nav */}
