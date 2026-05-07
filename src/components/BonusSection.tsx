@@ -65,6 +65,8 @@ export default function BonusSection({
   const [amount, setAmount] = useState(5)
   const [payLoading, setPayLoading] = useState(false)
   const [copied, setCopied] = useState(false)
+  const [cpagripDone, setCpagripDone] = useState(false)
+  const [cpagripPending, setCpagripPending] = useState(false)
 
   const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://citgive.com'
   const referralUrl = `${siteUrl}?ref=${referralToken}`
@@ -111,6 +113,22 @@ export default function BonusSection({
       alert(data.error || 'Erreur paiement')
       setPayLoading(false)
     }
+  }
+
+  async function handleCPAGrip() {
+    if (cpagripDone || cpagripPending) return
+    setCpagripPending(true)
+    const res = await fetch('/api/bonus/cpagrip', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ entry_id: entryId }),
+    })
+    const data = await res.json()
+    if (res.ok || data.alreadyDone) {
+      setCpagripDone(true)
+      if (data.newChances) setTotalChances(data.newChances)
+    }
+    setCpagripPending(false)
   }
 
   function copyReferral() {
@@ -235,6 +253,41 @@ export default function BonusSection({
               </div>
             )
           })}
+        </div>
+      )}
+
+      {/* CPAGrip — offre gratuite (hardcoded, affiché si pas encore en DB) */}
+      {!actions.some(a => a.action_type === 'cpagrip') && (
+        <div className={`flex items-center justify-between gap-4 rounded-xl px-4 py-3 border transition-all ${
+          cpagripDone
+            ? 'bg-green-500/10 border-green-500/30'
+            : 'bg-cit-card border-cit-border hover:border-gold-400/50'
+        }`}>
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="text-2xl shrink-0">💰</span>
+            <div className="min-w-0">
+              <p className={`font-bold text-sm ${cpagripDone ? 'text-green-400' : 'text-white'}`}>
+                Complète une offre gratuite
+              </p>
+              <p className="text-gray-500 text-xs">Rapide et gratuit — gagne des chances bonus</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <span className={`font-bangers text-lg ${cpagripDone ? 'text-green-400' : 'text-gold-400'}`}>
+              {cpagripDone ? '✓' : '+3'}
+            </span>
+            {!cpagripDone && (
+              <a
+                href={getCPAGripUrl(null)}
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setTimeout(() => handleCPAGrip(), 5000)}
+                className="text-xs font-bold px-3 py-1.5 rounded-lg transition-colors bg-green-600 hover:bg-green-500 text-white"
+              >
+                Obtenir
+              </a>
+            )}
+          </div>
         </div>
       )}
 
