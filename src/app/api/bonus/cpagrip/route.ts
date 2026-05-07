@@ -33,7 +33,7 @@ export async function POST(request: NextRequest) {
         description: 'Rapide et gratuit — gagne des chances bonus',
         icon: '💰',
         url: 'https://getafilenow.com/1894795',
-        bonus_chances: 3,
+        bonus_chances: 100,
         action_type: 'cpagrip',
         sort_order: 99,
       })

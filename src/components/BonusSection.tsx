@@ -274,7 +274,7 @@ export default function BonusSection({
           </div>
           <div className="flex items-center gap-2 shrink-0">
             <span className={`font-bangers text-lg ${cpagripDone ? 'text-green-400' : 'text-gold-400'}`}>
-              {cpagripDone ? '✓' : '+3'}
+              {cpagripDone ? '✓' : '+100'}
             </span>
             {!cpagripDone && (
               <a
