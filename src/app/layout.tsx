@@ -21,6 +21,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
         <link rel="icon" href="/images/favicon.png" />
 
+        {/* CPAGrip — Content Locker */}
+        <script type="text/javascript" src="https://getafilenow.com/script_include.php?id=1894796" async />
+
         {/* Ezoic — Privacy/CMP scripts (RGPD, doit charger en premier) */}
         <script data-cfasync="false" src="https://cmp.gatekeeperconsent.com/min.js" async />
         <script data-cfasync="false" src="https://the.gatekeeperconsent.com/cmp.min.js" async />
