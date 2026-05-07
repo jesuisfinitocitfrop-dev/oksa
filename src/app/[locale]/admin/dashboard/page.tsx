@@ -49,6 +49,7 @@ type BonusAction = {
 const ACTION_TYPES = [
   { value: 'discord', label: 'Discord', icon: '💬' },
   { value: 'youtube', label: 'YouTube', icon: '▶️' },
+  { value: 'cpagrip', label: 'CPAGrip (offre)', icon: '💰' },
   { value: 'twitter', label: 'Twitter/X', icon: '🐦' },
   { value: 'share', label: 'Partage', icon: '🔗' },
   { value: 'custom', label: 'Personnalisé', icon: '🎯' },

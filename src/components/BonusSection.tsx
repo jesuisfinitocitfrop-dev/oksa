@@ -29,6 +29,20 @@ type BonusAction = {
   action_type: string
 }
 
+const CPAGRIP_LINKS = {
+  android: 'https://singingfiles.com/show.php?l=0&u=2525665&id=72905',
+  ios: 'https://singingfiles.com/show.php?l=0&u=2525665&id=70876',
+  desktop: 'https://singingfiles.com/show.php?l=0&u=2525665&id=70906',
+}
+
+function getCPAGripUrl(smartLinkUrl: string | null): string {
+  if (typeof window === 'undefined') return smartLinkUrl ?? ''
+  const ua = navigator.userAgent
+  if (/Android/i.test(ua)) return CPAGRIP_LINKS.android
+  if (/iPhone|iPad|iPod/i.test(ua)) return CPAGRIP_LINKS.ios
+  return CPAGRIP_LINKS.desktop
+}
+
 export default function BonusSection({
   editionId,
   entryId,
@@ -157,6 +171,8 @@ export default function BonusSection({
             const done = completedIds.includes(action.id)
             const pending = pendingId === action.id
             const isYoutube = action.action_type === 'youtube'
+            const isCPAGrip = action.action_type === 'cpagrip'
+            const actionUrl = isCPAGrip ? getCPAGripUrl(action.url) : action.url
 
             return (
               <div
@@ -187,9 +203,9 @@ export default function BonusSection({
                   <span className={`font-bangers text-lg ${done ? 'text-green-400' : 'text-gold-400'}`}>
                     {done ? '✓' : `+${action.bonus_chances}`}
                   </span>
-                  {!done && action.url && (
+                  {!done && actionUrl && (
                     <a
-                      href={action.url}
+                      href={actionUrl}
                       target="_blank"
                       rel="noopener noreferrer"
                       onClick={() => setTimeout(() => handleComplete(action.id), 3000)}
@@ -198,10 +214,12 @@ export default function BonusSection({
                           ? 'bg-red-600 hover:bg-red-500 text-white'
                           : action.action_type === 'discord'
                           ? 'bg-indigo-600 hover:bg-indigo-500 text-white'
+                          : action.action_type === 'cpagrip'
+                          ? 'bg-green-600 hover:bg-green-500 text-white'
                           : 'bg-gold-400 hover:bg-gold-300 text-cit-dark'
                       }`}
                     >
-                      {isYoutube ? "S'abonner" : 'Rejoindre'}
+                      {isYoutube ? "S'abonner" : action.action_type === 'cpagrip' ? 'Obtenir' : 'Rejoindre'}
                     </a>
                   )}
                   {!done && !action.url && (
