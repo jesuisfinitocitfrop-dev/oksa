@@ -267,6 +267,8 @@ export default function BonusSection({
       {actions.length > 0 && (
         <div className="space-y-3">
           {actions.map(action => {
+            if (action.action_type === 'cpagrip' || action.action_type === 'cpagrip_smart') return null
+
             const done = completedIds.includes(action.id)
             const pending = pendingId === action.id
 
