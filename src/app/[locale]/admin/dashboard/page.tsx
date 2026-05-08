@@ -49,6 +49,8 @@ type BonusAction = {
 const ACTION_TYPES = [
   { value: 'discord', label: 'Discord', icon: '💬' },
   { value: 'youtube', label: 'YouTube', icon: '▶️' },
+  { value: 'pub', label: 'Pub (multi-clics → barre)', icon: '📺' },
+  { value: 'pub_click', label: 'Pub (1 clic = N chances)', icon: '🖱️' },
   { value: 'cpagrip', label: 'CPAGrip (offre)', icon: '💰' },
   { value: 'twitter', label: 'Twitter/X', icon: '🐦' },
   { value: 'share', label: 'Partage', icon: '🔗' },
@@ -540,9 +542,18 @@ export default function AdminDashboardPage() {
                     </select>
                   </div>
                   <div>
-                    <label className="block text-xs text-gray-400 mb-1">Description</label>
-                    <input value={bonusForm.description} onChange={e => setBonusForm({...bonusForm, description: e.target.value})}
-                      placeholder="Courte description..." className="cit-input w-full rounded-lg px-3 py-2 text-sm" />
+                    <label className="block text-xs text-gray-400 mb-1">
+                      {bonusForm.action_type === 'pub' ? 'Clics requis (ex: 33)' : 'Description'}
+                    </label>
+                    <input
+                      value={bonusForm.description}
+                      onChange={e => setBonusForm({...bonusForm, description: e.target.value})}
+                      placeholder={bonusForm.action_type === 'pub' ? '33' : 'Courte description...'}
+                      className="cit-input w-full rounded-lg px-3 py-2 text-sm"
+                    />
+                    {bonusForm.action_type === 'pub' && (
+                      <p className="text-xs text-indigo-400 mt-1">→ Nombre de clics avant d&apos;obtenir les chances bonus</p>
+                    )}
                   </div>
                   <div>
                     <label className="block text-xs text-gray-400 mb-1">URL (optionnel)</label>

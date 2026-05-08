@@ -69,6 +69,7 @@ export default function BonusSection({
   const [cpagripPending, setCpagripPending] = useState(false)
   const [smartLinkDone, setSmartLinkDone] = useState(false)
   const [smartLinkPending, setSmartLinkPending] = useState(false)
+  const [pubClickCounts, setPubClickCounts] = useState<Record<string, number>>({})
 
   const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://citgive.com'
   const referralUrl = `${siteUrl}?ref=${referralToken}`
@@ -77,10 +78,19 @@ export default function BonusSection({
     fetch(`/api/bonus/actions?edition_id=${editionId}&entry_id=${entryId}`)
       .then(r => r.json())
       .then(d => {
-        setActions(d.actions ?? [])
+        const actionsData: BonusAction[] = d.actions ?? []
+        setActions(actionsData)
         setCompletedIds(d.completedIds ?? [])
         setTotalChances(d.totalChances ?? 1)
         setTotalPaid(d.totalPaid ?? 0)
+        const counts: Record<string, number> = {}
+        actionsData.forEach(a => {
+          if (a.action_type === 'pub') {
+            const key = `pub_clicks_${entryId}_${a.id}`
+            counts[a.id] = parseInt(localStorage.getItem(key) || '0')
+          }
+        })
+        setPubClickCounts(counts)
         setLoading(false)
       })
   }, [editionId, entryId])
@@ -136,6 +146,22 @@ export default function BonusSection({
     }
     if (offerType === 'cpagrip_smart') setSmartLinkPending(false)
     else setCpagripPending(false)
+  }
+
+  function handlePubClick(action: BonusAction) {
+    if (completedIds.includes(action.id) || pendingId === action.id) return
+    const clicksRequired = parseInt(action.description || '33')
+    const current = pubClickCounts[action.id] || 0
+    const next = current + 1
+    const key = `pub_clicks_${entryId}_${action.id}`
+    if (next >= clicksRequired) {
+      localStorage.removeItem(key)
+      setPubClickCounts(prev => ({ ...prev, [action.id]: clicksRequired }))
+      setTimeout(() => handleComplete(action.id), 500)
+    } else {
+      localStorage.setItem(key, String(next))
+      setPubClickCounts(prev => ({ ...prev, [action.id]: next }))
+    }
   }
 
   function copyReferral() {
@@ -195,6 +221,88 @@ export default function BonusSection({
           {actions.map(action => {
             const done = completedIds.includes(action.id)
             const pending = pendingId === action.id
+
+            if (action.action_type === 'pub') {
+              const clicksRequired = parseInt(action.description || '33')
+              const currentClicks = pubClickCounts[action.id] || 0
+              const progress = Math.min((currentClicks / clicksRequired) * 100, 100)
+              return (
+                <div key={action.id} className={`rounded-xl border overflow-hidden transition-all ${done ? 'bg-green-500/10 border-green-500/30' : 'bg-cit-card border-cit-border'}`}>
+                  <div className="p-4">
+                    <div className="flex items-start justify-between gap-3 mb-3">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className="text-2xl shrink-0">📺</span>
+                        <div className="min-w-0">
+                          <p className={`font-bold text-sm ${done ? 'text-green-400' : 'text-white'}`}>{action.label}</p>
+                          <p className="text-gray-500 text-xs">Clique {clicksRequired} fois — offre gratuite</p>
+                        </div>
+                      </div>
+                      <span className={`font-bangers text-lg shrink-0 ${done ? 'text-green-400' : 'text-gold-400'}`}>
+                        {done ? '✓' : `+${action.bonus_chances}`}
+                      </span>
+                    </div>
+                    {done ? (
+                      <p className="text-green-400 text-sm font-bold text-center">✓ Complété ! +{action.bonus_chances} chances ajoutées</p>
+                    ) : (
+                      <>
+                        <div className="mb-3">
+                          <div className="flex justify-between text-xs text-gray-500 mb-1">
+                            <span>Progression</span>
+                            <span>{currentClicks}/{clicksRequired} clics</span>
+                          </div>
+                          <div className="h-2.5 bg-cit-dark rounded-full overflow-hidden">
+                            <div
+                              className="h-full bg-gradient-to-r from-purple-600 to-indigo-500 rounded-full transition-all duration-300"
+                              style={{ width: `${progress}%` }}
+                            />
+                          </div>
+                        </div>
+                        <a
+                          href={action.url || '#'}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={() => handlePubClick(action)}
+                          className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-2.5 rounded-lg transition-colors text-sm"
+                        >
+                          {pending ? '...' : 'Continuer →'}
+                        </a>
+                      </>
+                    )}
+                  </div>
+                </div>
+              )
+            }
+
+            if (action.action_type === 'pub_click') {
+              return (
+                <div key={action.id} className={`flex items-center justify-between gap-4 rounded-xl px-4 py-3 border transition-all ${done ? 'bg-green-500/10 border-green-500/30' : 'bg-cit-card border-cit-border hover:border-gold-400/50'}`}>
+                  <div className="flex items-center gap-3 min-w-0">
+                    <span className="text-2xl shrink-0">🖱️</span>
+                    <div className="min-w-0">
+                      <p className={`font-bold text-sm ${done ? 'text-green-400' : 'text-white'}`}>{action.label}</p>
+                      <p className="text-gray-500 text-xs">1 clic = {action.bonus_chances} chance{action.bonus_chances > 1 ? 's' : ''} de plus</p>
+                    </div>
+                  </div>
+                  <div className="flex items-center gap-2 shrink-0">
+                    <span className={`font-bangers text-lg ${done ? 'text-green-400' : 'text-gold-400'}`}>
+                      {done ? '✓' : `+${action.bonus_chances}`}
+                    </span>
+                    {!done && action.url && (
+                      <a
+                        href={action.url}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        onClick={() => setTimeout(() => handleComplete(action.id), 3000)}
+                        className="text-xs font-bold px-3 py-1.5 rounded-lg transition-colors bg-purple-600 hover:bg-purple-500 text-white"
+                      >
+                        {pending ? '...' : 'Cliquer →'}
+                      </a>
+                    )}
+                  </div>
+                </div>
+              )
+            }
+
             const isYoutube = action.action_type === 'youtube'
             const isCPAGrip = action.action_type === 'cpagrip'
             const actionUrl = isCPAGrip ? getCPAGripUrl(action.url) : action.url
