@@ -70,6 +70,11 @@ export default function BonusSection({
   const [smartLinkDone, setSmartLinkDone] = useState(false)
   const [smartLinkPending, setSmartLinkPending] = useState(false)
   const [pubClickCounts, setPubClickCounts] = useState<Record<string, number>>({})
+  const [hardcodedPubClicks, setHardcodedPubClicks] = useState(0)
+  const [hardcodedPubDone, setHardcodedPubDone] = useState(false)
+  const [hardcodedPubPending, setHardcodedPubPending] = useState(false)
+  const [hardcodedPubClickDone, setHardcodedPubClickDone] = useState(false)
+  const [hardcodedPubClickPending, setHardcodedPubClickPending] = useState(false)
 
   const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://citgive.com'
   const referralUrl = `${siteUrl}?ref=${referralToken}`
@@ -91,6 +96,8 @@ export default function BonusSection({
           }
         })
         setPubClickCounts(counts)
+        const hClicks = parseInt(localStorage.getItem(`pub_clicks_${entryId}_hardcoded`) || '0')
+        setHardcodedPubClicks(hClicks)
         setLoading(false)
       })
   }, [editionId, entryId])
@@ -146,6 +153,47 @@ export default function BonusSection({
     }
     if (offerType === 'cpagrip_smart') setSmartLinkPending(false)
     else setCpagripPending(false)
+  }
+
+  async function handleHardcodedPub() {
+    if (hardcodedPubDone || hardcodedPubPending) return
+    const next = hardcodedPubClicks + 1
+    const key = `pub_clicks_${entryId}_hardcoded`
+    if (next >= 33) {
+      localStorage.removeItem(key)
+      setHardcodedPubClicks(33)
+      setHardcodedPubPending(true)
+      const res = await fetch('/api/bonus/cpagrip', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ entry_id: entryId, offer_type: 'pub' }),
+      })
+      const data = await res.json()
+      if (res.ok || data.alreadyDone) {
+        setHardcodedPubDone(true)
+        if (data.newChances) setTotalChances(data.newChances)
+      }
+      setHardcodedPubPending(false)
+    } else {
+      localStorage.setItem(key, String(next))
+      setHardcodedPubClicks(next)
+    }
+  }
+
+  async function handleHardcodedPubClick() {
+    if (hardcodedPubClickDone || hardcodedPubClickPending) return
+    setHardcodedPubClickPending(true)
+    const res = await fetch('/api/bonus/cpagrip', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ entry_id: entryId, offer_type: 'pub_click' }),
+    })
+    const data = await res.json()
+    if (res.ok || data.alreadyDone) {
+      setHardcodedPubClickDone(true)
+      if (data.newChances) setTotalChances(data.newChances)
+    }
+    setHardcodedPubClickPending(false)
   }
 
   function handlePubClick(action: BonusAction) {
@@ -368,6 +416,82 @@ export default function BonusSection({
               </div>
             )
           })}
+        </div>
+      )}
+
+      {/* Pub — barre de progression 33 clics */}
+      {!actions.some(a => a.action_type === 'pub') && (
+        <div className={`rounded-xl border overflow-hidden transition-all ${hardcodedPubDone ? 'bg-green-500/10 border-green-500/30' : 'bg-cit-card border-cit-border'}`}>
+          <div className="p-4">
+            <div className="flex items-start justify-between gap-3 mb-3">
+              <div className="flex items-center gap-3 min-w-0">
+                <span className="text-2xl shrink-0">📺</span>
+                <div className="min-w-0">
+                  <p className={`font-bold text-sm ${hardcodedPubDone ? 'text-green-400' : 'text-white'}`}>Regarde une pub</p>
+                  <p className="text-gray-500 text-xs">Clique 33 fois — offre gratuite</p>
+                </div>
+              </div>
+              <span className={`font-bangers text-lg shrink-0 ${hardcodedPubDone ? 'text-green-400' : 'text-gold-400'}`}>
+                {hardcodedPubDone ? '✓' : '+100'}
+              </span>
+            </div>
+            {hardcodedPubDone ? (
+              <p className="text-green-400 text-sm font-bold text-center">✓ Complété ! +100 chances ajoutées</p>
+            ) : (
+              <>
+                <div className="mb-3">
+                  <div className="flex justify-between text-xs text-gray-500 mb-1">
+                    <span>Progression</span>
+                    <span>{hardcodedPubClicks}/33 clics</span>
+                  </div>
+                  <div className="h-2.5 bg-cit-dark rounded-full overflow-hidden">
+                    <div
+                      className="h-full bg-gradient-to-r from-purple-600 to-indigo-500 rounded-full transition-all duration-300"
+                      style={{ width: `${Math.min((hardcodedPubClicks / 33) * 100, 100)}%` }}
+                    />
+                  </div>
+                </div>
+                <a
+                  href="https://plump-plastic.com/0mtgIQ"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  onClick={handleHardcodedPub}
+                  className="flex items-center justify-center gap-2 w-full bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-bold py-2.5 rounded-lg transition-colors text-sm"
+                >
+                  {hardcodedPubPending ? '...' : 'Continuer →'}
+                </a>
+              </>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Pub click — 1 clic = 1 chance */}
+      {!actions.some(a => a.action_type === 'pub_click') && (
+        <div className={`flex items-center justify-between gap-4 rounded-xl px-4 py-3 border transition-all ${hardcodedPubClickDone ? 'bg-green-500/10 border-green-500/30' : 'bg-cit-card border-cit-border hover:border-gold-400/50'}`}>
+          <div className="flex items-center gap-3 min-w-0">
+            <span className="text-2xl shrink-0">🖱️</span>
+            <div className="min-w-0">
+              <p className={`font-bold text-sm ${hardcodedPubClickDone ? 'text-green-400' : 'text-white'}`}>1 clic = 1 chance de plus</p>
+              <p className="text-gray-500 text-xs">Clique une fois pour gagner une chance supplémentaire</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-2 shrink-0">
+            <span className={`font-bangers text-lg ${hardcodedPubClickDone ? 'text-green-400' : 'text-gold-400'}`}>
+              {hardcodedPubClickDone ? '✓' : '+1'}
+            </span>
+            {!hardcodedPubClickDone && (
+              <a
+                href="https://plump-plastic.com/0mtgIQ"
+                target="_blank"
+                rel="noopener noreferrer"
+                onClick={() => setTimeout(handleHardcodedPubClick, 3000)}
+                className="text-xs font-bold px-3 py-1.5 rounded-lg transition-colors bg-purple-600 hover:bg-purple-500 text-white"
+              >
+                {hardcodedPubClickPending ? '...' : 'Cliquer →'}
+              </a>
+            )}
+          </div>
         </div>
       )}
 

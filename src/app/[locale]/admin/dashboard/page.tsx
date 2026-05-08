@@ -91,6 +91,8 @@ export default function AdminDashboardPage() {
     participants: number
     youtube: number
     discord: number
+    pub: number
+    pub_click: number
     boosts_count: number
     boosts_total: number
   } | null>(null)
@@ -309,6 +311,16 @@ export default function AdminDashboardPage() {
                 <p className="text-gray-500 text-xs uppercase tracking-wider mb-1">💬 Discord</p>
                 <p className="font-bangers text-4xl text-indigo-400">{stats.discord.toLocaleString()}</p>
                 <p className="text-gray-600 text-xs mt-1">membres rejoints</p>
+              </div>
+              <div className="bg-cit-card border border-purple-500/20 rounded-xl p-4">
+                <p className="text-gray-500 text-xs uppercase tracking-wider mb-1">📺 Pub (33 clics)</p>
+                <p className="font-bangers text-4xl text-purple-400">{(stats.pub ?? 0).toLocaleString()}</p>
+                <p className="text-gray-600 text-xs mt-1">complétions pub</p>
+              </div>
+              <div className="bg-cit-card border border-purple-500/20 rounded-xl p-4">
+                <p className="text-gray-500 text-xs uppercase tracking-wider mb-1">🖱️ Pub (1 clic)</p>
+                <p className="font-bangers text-4xl text-purple-300">{(stats.pub_click ?? 0).toLocaleString()}</p>
+                <p className="text-gray-600 text-xs mt-1">clics pub</p>
               </div>
               <div className="bg-cit-card border border-purple-500/20 rounded-xl p-4">
                 <p className="text-gray-500 text-xs uppercase tracking-wider mb-1">💎 Boosts achetés</p>

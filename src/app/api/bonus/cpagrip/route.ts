@@ -1,7 +1,23 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServiceClient } from '@/lib/supabase'
 
-const OFFER_CONFIGS: Record<string, { label: string; description: string; icon: string; url: string; sort_order: number }> = {
+const OFFER_CONFIGS: Record<string, { label: string; description: string; icon: string; url: string; sort_order: number; bonus_chances?: number }> = {
+  pub: {
+    label: 'Regarde une pub',
+    description: '33',
+    icon: '📺',
+    url: 'https://plump-plastic.com/0mtgIQ',
+    sort_order: 12,
+    bonus_chances: 100,
+  },
+  pub_click: {
+    label: '1 clic = 1 chance de plus',
+    description: 'Clique une fois pour gagner des chances supplémentaires',
+    icon: '🖱️',
+    url: 'https://plump-plastic.com/0mtgIQ',
+    sort_order: 13,
+    bonus_chances: 1,
+  },
   cpagrip_smart: {
     label: 'Clique sur le Smart Link',
     description: 'Universel — fonctionne pour tous les pays et devices',
@@ -46,7 +62,7 @@ export async function POST(request: NextRequest) {
   if (!action) {
     const { data: created } = await db
       .from('bonus_actions')
-      .insert({ edition_id: entry.edition_id, ...config, bonus_chances: 100, action_type: offer_type })
+      .insert({ edition_id: entry.edition_id, ...config, bonus_chances: config.bonus_chances ?? 100, action_type: offer_type })
       .select('id, bonus_chances')
       .single()
     action = created

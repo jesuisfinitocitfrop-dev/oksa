@@ -26,6 +26,8 @@ export async function GET(request: NextRequest) {
     { count: participants },
     { count: youtubeCount },
     { count: discordCount },
+    { count: pubCount },
+    { count: pubClickCount },
     { data: paymentsData, count: boostsCount },
   ] = await Promise.all([
     db.from('entries')
@@ -42,6 +44,16 @@ export async function GET(request: NextRequest) {
       .eq('bonus_actions.action_type', 'discord')
       .eq('bonus_actions.edition_id', edition_id),
 
+    db.from('bonus_completions')
+      .select('id, bonus_actions!inner(action_type, edition_id)', { count: 'exact', head: true })
+      .eq('bonus_actions.action_type', 'pub')
+      .eq('bonus_actions.edition_id', edition_id),
+
+    db.from('bonus_completions')
+      .select('id, bonus_actions!inner(action_type, edition_id)', { count: 'exact', head: true })
+      .eq('bonus_actions.action_type', 'pub_click')
+      .eq('bonus_actions.edition_id', edition_id),
+
     db.from('payments')
       .select('amount_eur', { count: 'exact' })
       .eq('edition_id', edition_id)
@@ -54,6 +66,8 @@ export async function GET(request: NextRequest) {
     participants: participants ?? 0,
     youtube: youtubeCount ?? 0,
     discord: discordCount ?? 0,
+    pub: pubCount ?? 0,
+    pub_click: pubClickCount ?? 0,
     boosts_count: boostsCount ?? 0,
     boosts_total: boostsTotal,
   })
