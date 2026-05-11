@@ -73,7 +73,11 @@ export default function BonusSection({
   const [hardcodedPubClicks, setHardcodedPubClicks] = useState(0)
   const [hardcodedPubDone, setHardcodedPubDone] = useState(false)
   const [hardcodedPubPending, setHardcodedPubPending] = useState(false)
-  const [hardcodedPubClickDone, setHardcodedPubClickDone] = useState(false)
+  // pub_click répétable — compteur de clics session + cooldown
+  const [pubClickSessionCounts, setPubClickSessionCounts] = useState<Record<string, number>>({})
+  const [pubClickCooldowns, setPubClickCooldowns] = useState<Record<string, boolean>>({})
+  const [hardcodedPubClickCount, setHardcodedPubClickCount] = useState(0)
+  const [hardcodedPubClickCooldown, setHardcodedPubClickCooldown] = useState(false)
   const [hardcodedPubClickPending, setHardcodedPubClickPending] = useState(false)
 
   const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://citgive.com'
@@ -180,20 +184,41 @@ export default function BonusSection({
     }
   }
 
-  async function handleHardcodedPubClick() {
-    if (hardcodedPubClickDone || hardcodedPubClickPending) return
-    setHardcodedPubClickPending(true)
-    const res = await fetch('/api/bonus/cpagrip', {
+  async function handlePubClickAction(actionId: string | null) {
+    const cooldownKey = actionId ?? 'hardcoded'
+    if (pubClickCooldowns[cooldownKey] || hardcodedPubClickCooldown) return
+
+    // Activer le cooldown de 5s
+    if (actionId) {
+      setPubClickCooldowns(prev => ({ ...prev, [actionId]: true }))
+      setTimeout(() => setPubClickCooldowns(prev => ({ ...prev, [actionId]: false })), 5000)
+    } else {
+      setHardcodedPubClickCooldown(true)
+      setTimeout(() => setHardcodedPubClickCooldown(false), 5000)
+    }
+
+    if (!actionId) setHardcodedPubClickPending(true)
+
+    const body: Record<string, string> = { entry_id: entryId }
+    if (actionId) body.action_id = actionId
+
+    const res = await fetch('/api/bonus/pub-click', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ entry_id: entryId, offer_type: 'pub_click' }),
+      body: JSON.stringify(body),
     })
     const data = await res.json()
-    if (res.ok || data.alreadyDone) {
-      setHardcodedPubClickDone(true)
+
+    if (res.ok) {
       if (data.newChances) setTotalChances(data.newChances)
+      if (actionId) {
+        setPubClickSessionCounts(prev => ({ ...prev, [actionId]: (prev[actionId] ?? 0) + 1 }))
+      } else {
+        setHardcodedPubClickCount(prev => prev + 1)
+      }
     }
-    setHardcodedPubClickPending(false)
+
+    if (!actionId) setHardcodedPubClickPending(false)
   }
 
   function handlePubClick(action: BonusAction) {
@@ -324,30 +349,41 @@ export default function BonusSection({
             }
 
             if (action.action_type === 'pub_click') {
+              const sessionClicks = pubClickSessionCounts[action.id] ?? 0
+              const onCooldown = !!pubClickCooldowns[action.id]
               return (
-                <div key={action.id} className={`flex items-center justify-between gap-4 rounded-xl px-4 py-3 border transition-all ${done ? 'bg-green-500/10 border-green-500/30' : 'bg-cit-card border-cit-border hover:border-gold-400/50'}`}>
-                  <div className="flex items-center gap-3 min-w-0">
-                    <span className="text-2xl shrink-0">🖱️</span>
-                    <div className="min-w-0">
-                      <p className={`font-bold text-sm ${done ? 'text-green-400' : 'text-white'}`}>{action.label}</p>
-                      <p className="text-gray-500 text-xs">1 clic = {action.bonus_chances} chance{action.bonus_chances > 1 ? 's' : ''} de plus</p>
+                <div key={action.id} className="bg-cit-card border border-cit-border hover:border-gold-400/50 rounded-xl px-4 py-3 border transition-all">
+                  <div className="flex items-center justify-between gap-4">
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="text-2xl shrink-0">🖱️</span>
+                      <div className="min-w-0">
+                        <p className="font-bold text-sm text-white">{action.label}</p>
+                        <p className="text-gray-500 text-xs">
+                          1 clic = +{action.bonus_chances} chance{action.bonus_chances > 1 ? 's' : ''}
+                          {sessionClicks > 0 && (
+                            <span className="text-gold-400 ml-1">• {sessionClicks} clic{sessionClicks > 1 ? 's' : ''} (+{sessionClicks * action.bonus_chances} cette session)</span>
+                          )}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                  <div className="flex items-center gap-2 shrink-0">
-                    <span className={`font-bangers text-lg ${done ? 'text-green-400' : 'text-gold-400'}`}>
-                      {done ? '✓' : `+${action.bonus_chances}`}
-                    </span>
-                    {!done && action.url && (
-                      <a
-                        href={action.url}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        onClick={() => setTimeout(() => handleComplete(action.id), 3000)}
-                        className="text-xs font-bold px-3 py-1.5 rounded-lg transition-colors bg-purple-600 hover:bg-purple-500 text-white"
-                      >
-                        {pending ? '...' : 'Cliquer →'}
-                      </a>
-                    )}
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="font-bangers text-lg text-gold-400">+{action.bonus_chances}</span>
+                      {action.url && (
+                        <a
+                          href={action.url}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          onClick={() => setTimeout(() => handlePubClickAction(action.id), 2000)}
+                          className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors ${
+                            onCooldown
+                              ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                              : 'bg-purple-600 hover:bg-purple-500 text-white'
+                          }`}
+                        >
+                          {onCooldown ? '⏳ Attends...' : 'Cliquer →'}
+                        </a>
+                      )}
+                    </div>
                   </div>
                 </div>
               )
@@ -468,31 +504,38 @@ export default function BonusSection({
         </div>
       )}
 
-      {/* Pub click — 1 clic = 1 chance */}
+      {/* Pub click — répétable, 1 clic = N chances */}
       {!actions.some(a => a.action_type === 'pub_click') && (
-        <div className={`flex items-center justify-between gap-4 rounded-xl px-4 py-3 border transition-all ${hardcodedPubClickDone ? 'bg-green-500/10 border-green-500/30' : 'bg-cit-card border-cit-border hover:border-gold-400/50'}`}>
-          <div className="flex items-center gap-3 min-w-0">
-            <span className="text-2xl shrink-0">🖱️</span>
-            <div className="min-w-0">
-              <p className={`font-bold text-sm ${hardcodedPubClickDone ? 'text-green-400' : 'text-white'}`}>1 clic = 1 chance de plus</p>
-              <p className="text-gray-500 text-xs">Clique une fois pour gagner une chance supplémentaire</p>
+        <div className="bg-cit-card border border-cit-border hover:border-gold-400/50 rounded-xl px-4 py-3 transition-all">
+          <div className="flex items-center justify-between gap-4">
+            <div className="flex items-center gap-3 min-w-0">
+              <span className="text-2xl shrink-0">🖱️</span>
+              <div className="min-w-0">
+                <p className="font-bold text-sm text-white">1 clic = 1 chance de plus</p>
+                <p className="text-gray-500 text-xs">
+                  Clique autant de fois que tu veux !
+                  {hardcodedPubClickCount > 0 && (
+                    <span className="text-gold-400 ml-1">• {hardcodedPubClickCount} clic{hardcodedPubClickCount > 1 ? 's' : ''} (+{hardcodedPubClickCount} cette session)</span>
+                  )}
+                </p>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <span className={`font-bangers text-lg ${hardcodedPubClickDone ? 'text-green-400' : 'text-gold-400'}`}>
-              {hardcodedPubClickDone ? '✓' : '+1'}
-            </span>
-            {!hardcodedPubClickDone && (
+            <div className="flex items-center gap-2 shrink-0">
+              <span className="font-bangers text-lg text-gold-400">+1</span>
               <a
                 href="https://plump-plastic.com/0mtgIQ"
                 target="_blank"
                 rel="noopener noreferrer"
-                onClick={() => setTimeout(handleHardcodedPubClick, 3000)}
-                className="text-xs font-bold px-3 py-1.5 rounded-lg transition-colors bg-purple-600 hover:bg-purple-500 text-white"
+                onClick={() => setTimeout(() => handlePubClickAction(null), 2000)}
+                className={`text-xs font-bold px-3 py-1.5 rounded-lg transition-colors ${
+                  hardcodedPubClickCooldown
+                    ? 'bg-gray-600 text-gray-400 cursor-not-allowed'
+                    : 'bg-purple-600 hover:bg-purple-500 text-white'
+                }`}
               >
-                {hardcodedPubClickPending ? '...' : 'Cliquer →'}
+                {hardcodedPubClickPending ? '...' : hardcodedPubClickCooldown ? '⏳ Attends...' : 'Cliquer →'}
               </a>
-            )}
+            </div>
           </div>
         </div>
       )}

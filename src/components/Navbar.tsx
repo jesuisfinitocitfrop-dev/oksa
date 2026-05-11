@@ -48,11 +48,11 @@ export default function Navbar({ locale }: { locale: string }) {
     window.location.href = segments.join('/')
   }
 
-  const links = [
+  const links: { href: string; label: string; highlight?: boolean }[] = [
     { href: `/${locale}`, label: t('home') },
     { href: `/${locale}/winners`, label: t('winners') },
-    { href: `/${locale}/shop`, label: t('shop') },
     { href: `/${locale}/supporters`, label: t('supporters') },
+    { href: `/${locale}/premium`, label: '🏇 Premium', highlight: true },
   ]
 
   return (
@@ -85,9 +85,11 @@ export default function Navbar({ locale }: { locale: string }) {
             <Link
               key={link.href}
               href={link.href}
-              className={`text-sm font-medium transition-colors hover:text-gold-400 ${
-                pathname === link.href ? 'text-gold-400' : 'text-gray-400'
-              }`}
+              className={
+                link.highlight
+                  ? `text-sm font-bold transition-colors bg-gradient-to-r from-orange-500 to-amber-500 text-white px-3 py-1.5 rounded-lg hover:from-orange-400 hover:to-amber-400`
+                  : `text-sm font-medium transition-colors hover:text-gold-400 ${pathname === link.href ? 'text-gold-400' : 'text-gray-400'}`
+              }
             >
               {link.label}
             </Link>
@@ -134,9 +136,11 @@ export default function Navbar({ locale }: { locale: string }) {
             <Link
               key={link.href}
               href={link.href}
-              className={`block px-5 py-4 text-base font-medium border-b border-cit-border/50 transition-colors hover:text-gold-400 ${
-                pathname === link.href ? 'text-gold-400' : 'text-gray-300'
-              }`}
+              className={
+                link.highlight
+                  ? `block px-5 py-4 text-base font-bold border-b border-cit-border/50 text-orange-400 hover:text-orange-300 transition-colors`
+                  : `block px-5 py-4 text-base font-medium border-b border-cit-border/50 transition-colors hover:text-gold-400 ${pathname === link.href ? 'text-gold-400' : 'text-gray-300'}`
+              }
               onClick={() => setMenuOpen(false)}
             >
               {link.label}

@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import RulesModal from './RulesModal'
 import BonusSection from './BonusSection'
+import PremiumBanner from './PremiumBanner'
 
 type Status = 'idle' | 'loading' | 'success' | 'error' | 'returning'
 
@@ -121,6 +122,8 @@ export default function EntryForm({
             paymentSuccess={paymentSuccess}
           />
         </div>
+
+        <PremiumBanner locale={locale} />
       </div>
     )
   }
