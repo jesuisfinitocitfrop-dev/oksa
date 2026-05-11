@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
   }
 
   const body = await request.json()
-  const { title, title_en, title_es, prize_name, prize_image_url, end_date, draw_date } = body
+  const { title, title_en, title_es, prize_name, prize_image_url, end_date, draw_date, is_premium } = body
 
   if (!title || !prize_name || !end_date || !draw_date) {
     return NextResponse.json({ error: 'Missing required fields' }, { status: 400 })
@@ -62,6 +62,7 @@ export async function POST(request: NextRequest) {
     draw_date,
     is_active: true,
     is_drawn: false,
+    is_premium: is_premium ?? false,
   }).select().single()
 
   if (error) {

@@ -32,6 +32,28 @@ type Edition = {
   draw_date: string
   is_active: boolean
   is_drawn: boolean
+  is_premium: boolean
+}
+
+type Subscription = {
+  id: string
+  email: string
+  roblox_username: string | null
+  tier: 'starter' | 'plus' | 'vip'
+  amount_eur: number
+  status: string
+  giveaways_remaining: number
+  bonus_chances: number
+  created_at: string
+}
+
+type PremiumEntry = {
+  id: string
+  email: string
+  roblox_username: string
+  chances: number
+  created_at: string
+  subscriptions: { tier: string; amount_eur: number } | null
 }
 
 type BonusAction = {
@@ -71,7 +93,7 @@ export default function AdminDashboardPage() {
   const [form, setForm] = useState({
     title: '', title_en: '', title_es: '',
     prize_name: '', prize_image_url: '',
-    end_date: '', draw_date: '',
+    end_date: '', draw_date: '', is_premium: false,
   })
   const [creating, setCreating] = useState(false)
   const [createSuccess, setCreateSuccess] = useState(false)
@@ -85,6 +107,17 @@ export default function AdminDashboardPage() {
   const [editForm, setEditForm] = useState<Partial<Edition>>({})
   const [editSaving, setEditSaving] = useState(false)
   const [editSuccess, setEditSuccess] = useState(false)
+
+  // Premium
+  const [subscriptions, setSubscriptions] = useState<Subscription[]>([])
+  const [subStats, setSubStats] = useState<{ total: number; active: number; starter: number; plus: number; vip: number; monthly_revenue: number } | null>(null)
+  const [premiumEdition, setPremiumEdition] = useState<Edition | null>(null)
+  const [premiumEntries, setPremiumEntries] = useState<PremiumEntry[]>([])
+  const [premiumEntryCount, setPremiumEntryCount] = useState(0)
+  const [premiumTotalChances, setPremiumTotalChances] = useState(0)
+  const [premiumDrawResult, setPremiumDrawResult] = useState<{ winner: PremiumEntry; total_chances: number } | null>(null)
+  const [premiumDrawing, setPremiumDrawing] = useState(false)
+  const [cancellingSubId, setCancellingSubId] = useState<string | null>(null)
 
   // Stats
   const [stats, setStats] = useState<{
@@ -118,12 +151,69 @@ export default function AdminDashboardPage() {
     }
   }, [activeEdition?.id])
 
+  useEffect(() => {
+    fetchSubscriptions()
+  }, [])
+
+  useEffect(() => {
+    if (premiumEdition) fetchPremiumEntries(premiumEdition.id)
+  }, [premiumEdition?.id])
+
   async function fetchEditions() {
     const res = await fetch('/api/admin/edition')
     if (res.status === 401) { router.push(`/${locale}/admin/login`); return }
     const data = await res.json()
-    setEditions(data.editions ?? [])
+    const all: Edition[] = data.editions ?? []
+    setEditions(all)
+    const pEd = all.find(e => e.is_premium && e.is_active && !e.is_drawn) ?? null
+    setPremiumEdition(pEd)
     setLoading(false)
+  }
+
+  async function fetchSubscriptions() {
+    const res = await fetch('/api/admin/subscriptions')
+    if (!res.ok) return
+    const data = await res.json()
+    setSubscriptions(data.subscriptions ?? [])
+    setSubStats(data.stats ?? null)
+  }
+
+  async function fetchPremiumEntries(editionId: string) {
+    const res = await fetch(`/api/admin/premium-entries?edition_id=${editionId}`)
+    if (!res.ok) return
+    const data = await res.json()
+    setPremiumEntries(data.entries ?? [])
+    setPremiumEntryCount(data.count ?? 0)
+    setPremiumTotalChances(data.total_chances ?? 0)
+  }
+
+  async function handleCancelSubscription(id: string) {
+    if (!confirm('Annuler cet abonnement ?')) return
+    setCancellingSubId(id)
+    await fetch('/api/admin/subscriptions', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ id, status: 'cancelled' }),
+    })
+    setCancellingSubId(null)
+    fetchSubscriptions()
+  }
+
+  async function handlePremiumDraw() {
+    if (!premiumEdition) return
+    if (!confirm('Lancer le tirage du giveaway premium ? Cette action est irréversible.')) return
+    setPremiumDrawing(true)
+    const res = await fetch('/api/admin/premium-entries', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ edition_id: premiumEdition.id }),
+    })
+    const data = await res.json()
+    if (res.ok) {
+      setPremiumDrawResult({ winner: data.winner, total_chances: data.total_chances })
+      fetchEditions()
+    }
+    setPremiumDrawing(false)
   }
 
   async function fetchEntryCount(editionId: string) {
@@ -183,7 +273,7 @@ export default function AdminDashboardPage() {
     if (res.ok) {
       setCreateSuccess(true)
       setShowForm(false)
-      setForm({ title: '', title_en: '', title_es: '', prize_name: '', prize_image_url: '', end_date: '', draw_date: '' })
+      setForm({ title: '', title_en: '', title_es: '', prize_name: '', prize_image_url: '', end_date: '', draw_date: '', is_premium: false })
       fetchEditions()
     }
     setCreating(false)
@@ -199,6 +289,8 @@ export default function AdminDashboardPage() {
       prize_image_url: ed.prize_image_url ?? '',
       end_date: ed.end_date.slice(0, 16),
       draw_date: ed.draw_date.slice(0, 16),
+      is_premium: ed.is_premium,
+      is_active: ed.is_active,
     })
     setEditSuccess(false)
   }
@@ -502,6 +594,22 @@ export default function AdminDashboardPage() {
                   className="cit-input w-full rounded-xl px-4 py-3 text-sm" />
               </div>
               <div className="md:col-span-2">
+                <label className="flex items-center gap-3 cursor-pointer select-none">
+                  <div
+                    onClick={() => setForm({...form, is_premium: !form.is_premium})}
+                    className={`w-11 h-6 rounded-full transition-colors flex items-center px-1 ${form.is_premium ? 'bg-orange-500' : 'bg-gray-600'}`}
+                  >
+                    <div className={`w-4 h-4 bg-white rounded-full transition-transform ${form.is_premium ? 'translate-x-5' : 'translate-x-0'}`} />
+                  </div>
+                  <div>
+                    <span className={`text-sm font-medium ${form.is_premium ? 'text-orange-400' : 'text-gray-400'}`}>
+                      🏇 Giveaway Premium (abonnement payant)
+                    </span>
+                    <p className="text-xs text-gray-600">Les participants devront avoir un abonnement actif</p>
+                  </div>
+                </label>
+              </div>
+              <div className="md:col-span-2">
                 <button type="submit" disabled={creating}
                   className="btn-fire rounded-xl px-8 py-3 font-bangers text-xl text-cit-dark disabled:opacity-60">
                   <span>{creating ? '...' : tEd('create')}</span>
@@ -644,6 +752,138 @@ export default function AdminDashboardPage() {
           </div>
         )}
 
+        {/* ─── SECTION PREMIUM ─────────────────────────── */}
+        <div className="mb-10">
+          <h2 className="font-bangers text-2xl text-white mb-4">🏇 Giveaways Premium</h2>
+
+          {/* Stats abonnements */}
+          {subStats && (
+            <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-6">
+              <div className="bg-gradient-to-b from-orange-500/10 to-transparent border border-orange-500/30 rounded-xl p-4">
+                <p className="text-gray-500 text-xs uppercase tracking-wider mb-1">Abonnés actifs</p>
+                <p className="font-bangers text-4xl text-orange-400">{subStats.active}</p>
+              </div>
+              <div className="bg-cit-card border border-cit-border rounded-xl p-4">
+                <p className="text-gray-500 text-xs uppercase tracking-wider mb-1">Revenu mensuel</p>
+                <p className="font-bangers text-4xl text-green-400">{subStats.monthly_revenue}€</p>
+              </div>
+              <div className="bg-cit-card border border-cit-border rounded-xl p-4 col-span-2 md:col-span-1">
+                <p className="text-gray-500 text-xs uppercase tracking-wider mb-2">Répartition</p>
+                <div className="flex gap-3 text-sm">
+                  <span className="text-blue-400">🎫 {subStats.starter} Starter</span>
+                  <span className="text-purple-400">💎 {subStats.plus} Plus</span>
+                  <span className="text-amber-400">👑 {subStats.vip} VIP</span>
+                </div>
+              </div>
+            </div>
+          )}
+
+          {/* Giveaway premium actif */}
+          {premiumEdition ? (
+            <div className="bg-gradient-to-b from-orange-500/10 to-transparent border border-orange-500/30 rounded-xl p-5 mb-4">
+              <div className="flex items-center justify-between gap-4 mb-4">
+                <div>
+                  <p className="text-xs text-orange-400 uppercase tracking-widest mb-1">Giveaway premium actif</p>
+                  <p className="font-bold text-white text-lg">{premiumEdition.prize_name}</p>
+                  <p className="text-gray-500 text-sm">{premiumEntryCount} participants · {premiumTotalChances} chances totales</p>
+                </div>
+                {!premiumEdition.is_drawn && (
+                  <button
+                    onClick={handlePremiumDraw}
+                    disabled={premiumDrawing || premiumEntryCount === 0}
+                    className="shrink-0 bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-400 hover:to-amber-400 text-white font-bangers text-lg px-5 py-2.5 rounded-xl transition-all disabled:opacity-60"
+                  >
+                    {premiumDrawing ? '⏳...' : '🎲 TIRER AU SORT'}
+                  </button>
+                )}
+              </div>
+
+              {premiumDrawResult && (
+                <div className="bg-orange-500/20 border border-orange-500/40 rounded-xl px-5 py-4 mb-4 text-center animate-scale-in">
+                  <div className="text-4xl mb-2">🎃</div>
+                  <p className="font-bangers text-2xl text-orange-400">GAGNANT PREMIUM</p>
+                  <p className="font-bold text-white text-xl">{premiumDrawResult.winner.roblox_username}</p>
+                  <p className="text-gray-400 text-sm">{premiumDrawResult.winner.email} · {premiumDrawResult.winner.chances} chances sur {premiumDrawResult.total_chances}</p>
+                </div>
+              )}
+
+              {/* Participants premium */}
+              {premiumEntries.length > 0 && (
+                <div className="space-y-2">
+                  {premiumEntries.map(entry => (
+                    <div key={entry.id} className="flex items-center justify-between gap-3 bg-cit-dark/50 rounded-lg px-4 py-2.5 text-sm">
+                      <div className="flex items-center gap-3 min-w-0">
+                        <span className="text-lg shrink-0">
+                          {entry.subscriptions?.tier === 'vip' ? '👑' : entry.subscriptions?.tier === 'plus' ? '💎' : '🎫'}
+                        </span>
+                        <div className="min-w-0">
+                          <p className="font-bold text-white truncate">{entry.roblox_username}</p>
+                          <p className="text-gray-500 text-xs truncate">{entry.email}</p>
+                        </div>
+                      </div>
+                      <div className="flex items-center gap-2 shrink-0">
+                        <span className="font-bangers text-gold-400">{entry.chances} chances</span>
+                        <span className="text-gray-600 text-xs">{new Date(entry.created_at).toLocaleDateString('fr-FR')}</span>
+                      </div>
+                    </div>
+                  ))}
+                </div>
+              )}
+            </div>
+          ) : (
+            <div className="bg-cit-card border border-dashed border-orange-500/30 rounded-xl p-6 text-center text-gray-500 text-sm mb-4">
+              Aucun giveaway premium actif. Crée une édition avec le toggle <span className="text-orange-400">🏇 Premium</span>.
+            </div>
+          )}
+
+          {/* Liste des abonnements */}
+          {subscriptions.length > 0 && (
+            <div>
+              <h3 className="font-bold text-gray-300 text-sm mb-3">Tous les abonnements ({subscriptions.length})</h3>
+              <div className="space-y-2 max-h-80 overflow-y-auto pr-1">
+                {subscriptions.map(sub => (
+                  <div key={sub.id} className={`flex items-center justify-between gap-3 rounded-xl px-4 py-3 border text-sm ${
+                    sub.status === 'active' ? 'bg-cit-card border-cit-border' : 'bg-cit-card/50 border-cit-border/50 opacity-60'
+                  }`}>
+                    <div className="flex items-center gap-3 min-w-0">
+                      <span className="text-xl shrink-0">
+                        {sub.tier === 'vip' ? '👑' : sub.tier === 'plus' ? '💎' : '🎫'}
+                      </span>
+                      <div className="min-w-0">
+                        <div className="flex items-center gap-2 flex-wrap">
+                          <p className="font-bold text-white truncate">{sub.email}</p>
+                          <span className={`text-xs px-1.5 py-0.5 rounded-full ${
+                            sub.status === 'active' ? 'bg-green-500/20 text-green-400' :
+                            sub.status === 'past_due' ? 'bg-yellow-500/20 text-yellow-400' :
+                            'bg-red-500/20 text-red-400'
+                          }`}>{sub.status}</span>
+                        </div>
+                        <p className="text-gray-500 text-xs">
+                          {sub.tier.toUpperCase()} · {sub.amount_eur}€/mois
+                          {sub.roblox_username && ` · ${sub.roblox_username}`}
+                          {sub.tier !== 'vip' && ` · ${sub.giveaways_remaining} slot${sub.giveaways_remaining > 1 ? 's' : ''} restant${sub.giveaways_remaining > 1 ? 's' : ''}`}
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 shrink-0">
+                      <span className="text-gray-600 text-xs">{new Date(sub.created_at).toLocaleDateString('fr-FR')}</span>
+                      {sub.status === 'active' && (
+                        <button
+                          onClick={() => handleCancelSubscription(sub.id)}
+                          disabled={cancellingSubId === sub.id}
+                          className="text-xs text-red-500/70 hover:text-red-400 px-2 py-1 rounded border border-red-500/20 hover:border-red-500/50 transition-colors disabled:opacity-60"
+                        >
+                          {cancellingSubId === sub.id ? '...' : 'Annuler'}
+                        </button>
+                      )}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          )}
+        </div>
+
         {/* ─── PAST EDITIONS ───────────────────────────── */}
         {editions.length > 0 && (
           <div>
@@ -656,6 +896,7 @@ export default function AdminDashboardPage() {
                     <p className="text-gray-500 text-sm">{ed.prize_name}</p>
                   </div>
                   <div className="flex items-center gap-3">
+                    {ed.is_premium && <span className="text-xs bg-orange-500/20 text-orange-400 px-2 py-1 rounded-full">🏇 Premium</span>}
                     {ed.is_drawn && <span className="text-xs bg-green-500/20 text-green-400 px-2 py-1 rounded-full">Tiré</span>}
                     {ed.is_active && !ed.is_drawn && <span className="text-xs bg-gold-400/20 text-gold-400 px-2 py-1 rounded-full">Actif</span>}
                     {!ed.is_active && !ed.is_drawn && <span className="text-xs bg-gray-500/20 text-gray-400 px-2 py-1 rounded-full">Inactif</span>}
@@ -722,6 +963,31 @@ export default function AdminDashboardPage() {
                 <label className="block text-xs text-gray-400 mb-1">Date du tirage *</label>
                 <input type="datetime-local" required value={editForm.draw_date ?? ''} onChange={e => setEditForm({...editForm, draw_date: e.target.value})}
                   className="cit-input w-full rounded-xl px-4 py-3 text-sm" />
+              </div>
+
+              <div className="md:col-span-2 flex flex-col gap-3">
+                <label className="flex items-center gap-3 cursor-pointer select-none">
+                  <div
+                    onClick={() => setEditForm({...editForm, is_premium: !editForm.is_premium})}
+                    className={`w-11 h-6 rounded-full transition-colors flex items-center px-1 ${editForm.is_premium ? 'bg-orange-500' : 'bg-gray-600'}`}
+                  >
+                    <div className={`w-4 h-4 bg-white rounded-full transition-transform ${editForm.is_premium ? 'translate-x-5' : 'translate-x-0'}`} />
+                  </div>
+                  <span className={`text-sm font-medium ${editForm.is_premium ? 'text-orange-400' : 'text-gray-400'}`}>
+                    🏇 Giveaway Premium
+                  </span>
+                </label>
+                <label className="flex items-center gap-3 cursor-pointer select-none">
+                  <div
+                    onClick={() => setEditForm({...editForm, is_active: !editForm.is_active})}
+                    className={`w-11 h-6 rounded-full transition-colors flex items-center px-1 ${editForm.is_active ? 'bg-green-500' : 'bg-gray-600'}`}
+                  >
+                    <div className={`w-4 h-4 bg-white rounded-full transition-transform ${editForm.is_active ? 'translate-x-5' : 'translate-x-0'}`} />
+                  </div>
+                  <span className={`text-sm font-medium ${editForm.is_active ? 'text-green-400' : 'text-gray-400'}`}>
+                    ✅ Édition active
+                  </span>
+                </label>
               </div>
 
               {editSuccess && (

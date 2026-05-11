@@ -18,7 +18,7 @@ export async function PUT(
   }
 
   const body = await request.json()
-  const allowed = ['title', 'title_en', 'title_es', 'prize_name', 'prize_image_url', 'end_date', 'draw_date']
+  const allowed = ['title', 'title_en', 'title_es', 'prize_name', 'prize_image_url', 'end_date', 'draw_date', 'is_premium', 'is_active']
   const updates: Record<string, unknown> = {}
   for (const key of allowed) {
     if (key in body) updates[key] = body[key]
