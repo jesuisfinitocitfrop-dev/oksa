@@ -111,7 +111,7 @@ export default async function PremiumPage({
             <div className="relative rounded-2xl overflow-hidden w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 mx-auto"
               style={{ boxShadow: '0 0 60px rgba(255, 140, 0, 0.4)' }}>
               <Image
-                src={edition?.prize_image_url || '/images/headless.png'}
+                src={edition?.prize_image_url || '/images/Headlesshorseman.webp'}
                 alt="Headless Horseman"
                 fill
                 className="object-cover"
