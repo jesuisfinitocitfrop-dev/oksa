@@ -13,6 +13,7 @@ import TungTungGame from '@/components/TungTungGame'
 import { SupporterBadge } from '@/components/SupportersBadge'
 import SupportersSection from '@/components/SupportersSection'
 import EzoicAd from '@/components/EzoicAd'
+import GiftBoxReveal from '@/components/GiftBoxReveal'
 import { Link } from '@/navigation'
 
 async function getActiveEdition() {
@@ -143,23 +144,9 @@ export default async function HomePage({
                 </div>
               </div>
 
-              {/* Right: dragon image */}
-              <div className="shrink-0 animate-float">
-                <div className="relative">
-                  <Image
-                    src={dragonImage}
-                    alt={edition.prize_name}
-                    width={280}
-                    height={280}
-                    className="dragon-glow rounded-2xl w-44 h-44 sm:w-52 sm:h-52 md:w-64 md:h-64 lg:w-72 lg:h-72 object-cover"
-                    priority
-                  />
-                  <div className="absolute -bottom-3 left-1/2 -translate-x-1/2 whitespace-nowrap">
-                    <span className="bg-gold-400 text-cit-dark font-bangers text-sm md:text-base px-3 py-1 rounded-full">
-                      {edition.prize_name}
-                    </span>
-                  </div>
-                </div>
+              {/* Right: gift box reveal */}
+              <div className="shrink-0">
+                <GiftBoxReveal locale={locale} dragonImage={dragonImage} />
               </div>
             </div>
 
@@ -274,6 +261,36 @@ export default async function HomePage({
 
       {/* ── SUPPORTERS (client-side, mise à jour automatique) ── */}
       {edition && <SupportersSection editionId={edition.id} />}
+
+      {/* ── HEADLESS HORSEMAN BANNER ──────────────────────── */}
+      <section className="relative z-10 py-8 px-4">
+        <div className="max-w-2xl mx-auto">
+          <Link
+            href={`/${locale}/premium`}
+            className="group flex items-center gap-4 bg-gradient-to-r from-orange-950/60 to-cit-card
+              border border-orange-500/30 hover:border-orange-500/70 rounded-2xl px-5 py-4
+              transition-all duration-300 hover:shadow-[0_0_30px_rgba(255,140,0,0.2)]"
+          >
+            <div className="relative w-14 h-14 shrink-0 rounded-xl overflow-hidden border border-orange-500/30">
+              <Image
+                src="/images/Headlesshorseman.webp"
+                alt="Headless Horseman"
+                fill
+                className="object-cover"
+              />
+            </div>
+            <div className="flex-1 min-w-0">
+              <p className="text-orange-400 font-bangers text-xl leading-none mb-0.5">
+                🎃 Tente de gagner le Headless Horseman
+              </p>
+              <p className="text-gray-500 text-xs truncate">
+                Giveaway premium exclusif — abonnement dès 5€/mois
+              </p>
+            </div>
+            <span className="text-orange-400 text-xl shrink-0 group-hover:translate-x-1 transition-transform">→</span>
+          </Link>
+        </div>
+      </section>
 
       {/* ── MINI-JEU ──────────────────────────────────────── */}
       <section className="relative z-10 py-12 md:py-16 px-4 border-t border-cit-border">
