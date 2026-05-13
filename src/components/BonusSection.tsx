@@ -29,19 +29,6 @@ type BonusAction = {
   action_type: string
 }
 
-const CPAGRIP_LINKS = {
-  android: 'https://singingfiles.com/show.php?l=0&u=2525665&id=72905',
-  ios: 'https://singingfiles.com/show.php?l=0&u=2525665&id=70876',
-  desktop: 'https://singingfiles.com/show.php?l=0&u=2525665&id=70906',
-}
-
-function getCPAGripUrl(smartLinkUrl: string | null): string {
-  if (typeof window === 'undefined') return smartLinkUrl ?? ''
-  const ua = navigator.userAgent
-  if (/Android/i.test(ua)) return CPAGRIP_LINKS.android
-  if (/iPhone|iPad|iPod/i.test(ua)) return CPAGRIP_LINKS.ios
-  return CPAGRIP_LINKS.desktop
-}
 
 export default function BonusSection({
   editionId,
@@ -65,10 +52,7 @@ export default function BonusSection({
   const [amount, setAmount] = useState(5)
   const [payLoading, setPayLoading] = useState(false)
   const [copied, setCopied] = useState(false)
-  const [cpagripDone, setCpagripDone] = useState(false)
-  const [cpagripPending, setCpagripPending] = useState(false)
-  const [smartLinkDone, setSmartLinkDone] = useState(false)
-  const [smartLinkPending, setSmartLinkPending] = useState(false)
+  const [cpagripChances, setCpagripChances] = useState(0)
 
   const siteUrl = typeof window !== 'undefined' ? window.location.origin : 'https://citgive.com'
   const referralUrl = `${siteUrl}?ref=${referralToken}`
@@ -83,6 +67,11 @@ export default function BonusSection({
         setTotalPaid(d.totalPaid ?? 0)
         setLoading(false)
       })
+    // Fetch CPAGrip stats
+    fetch(`/api/booster/status?entry_id=${entryId}`)
+      .then(r => r.json())
+      .then(d => { if (d.bonus_breakdown) setCpagripChances(d.bonus_breakdown.cpagrip_total ?? 0) })
+      .catch(() => {})
   }, [editionId, entryId])
 
   async function handleComplete(actionId: string) {
@@ -117,26 +106,6 @@ export default function BonusSection({
     }
   }
 
-  async function handleCPAGrip(offerType: 'cpagrip' | 'cpagrip_smart') {
-    const isDone = offerType === 'cpagrip_smart' ? smartLinkDone : cpagripDone
-    const isPending = offerType === 'cpagrip_smart' ? smartLinkPending : cpagripPending
-    if (isDone || isPending) return
-    if (offerType === 'cpagrip_smart') setSmartLinkPending(true)
-    else setCpagripPending(true)
-    const res = await fetch('/api/bonus/cpagrip', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ entry_id: entryId, offer_type: offerType }),
-    })
-    const data = await res.json()
-    if (res.ok || data.alreadyDone) {
-      if (offerType === 'cpagrip_smart') setSmartLinkDone(true)
-      else setCpagripDone(true)
-      if (data.newChances) setTotalChances(data.newChances)
-    }
-    if (offerType === 'cpagrip_smart') setSmartLinkPending(false)
-    else setCpagripPending(false)
-  }
 
   function copyReferral() {
     navigator.clipboard.writeText(referralUrl)
@@ -196,8 +165,8 @@ export default function BonusSection({
             const done = completedIds.includes(action.id)
             const pending = pendingId === action.id
             const isYoutube = action.action_type === 'youtube'
-            const isCPAGrip = action.action_type === 'cpagrip'
-            const actionUrl = isCPAGrip ? getCPAGripUrl(action.url) : action.url
+            const isCPAGrip = action.action_type === 'cpagrip' || action.action_type === 'cpagrip_smart'
+            const actionUrl = isCPAGrip ? `/fr/booster/offres?entry_id=${entryId}` : action.url
 
             return (
               <div
@@ -263,75 +232,26 @@ export default function BonusSection({
         </div>
       )}
 
-      {/* Smart Link CPAGrip — universel */}
-      {!actions.some(a => a.action_type === 'cpagrip_smart') && (
-        <div className={`flex items-center justify-between gap-4 rounded-xl px-4 py-3 border transition-all ${
-          smartLinkDone
-            ? 'bg-green-500/10 border-green-500/30'
-            : 'bg-cit-card border-cit-border hover:border-gold-400/50'
-        }`}>
-          <div className="flex items-center gap-3 min-w-0">
-            <span className="text-2xl shrink-0">🔗</span>
-            <div className="min-w-0">
-              <p className={`font-bold text-sm ${smartLinkDone ? 'text-green-400' : 'text-white'}`}>
-                Clique sur le Smart Link
-              </p>
-              <p className="text-gray-500 text-xs">Offre gratuite — disponible partout dans le monde</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <span className={`font-bangers text-lg ${smartLinkDone ? 'text-green-400' : 'text-gold-400'}`}>
-              {smartLinkDone ? '✓' : '+100'}
-            </span>
-            {!smartLinkDone && (
-              <a
-                href="https://getafilenow.com/1894795"
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setTimeout(() => handleCPAGrip('cpagrip_smart'), 5000)}
-                className="text-xs font-bold px-3 py-1.5 rounded-lg transition-colors bg-green-600 hover:bg-green-500 text-white"
-              >
-                Obtenir
-              </a>
-            )}
+      {/* Offer Wall CPAGrip — nouveau système postback */}
+      <div className="bg-gradient-to-br from-green-900/30 to-emerald-900/20 border border-green-500/30 rounded-xl p-4">
+        <div className="flex items-center gap-3 mb-3">
+          <span className="text-2xl shrink-0">🎁</span>
+          <div className="min-w-0">
+            <p className="font-bold text-sm text-white">Complète des offres partenaires</p>
+            <p className="text-gray-500 text-xs">
+              {cpagripChances > 0
+                ? `+${cpagripChances} chances déjà gagnées via offres`
+                : 'Gagne de 20 à 700+ chances par offre complétée'}
+            </p>
           </div>
         </div>
-      )}
-
-      {/* CPAGrip — offre adaptée au device */}
-      {!actions.some(a => a.action_type === 'cpagrip') && (
-        <div className={`flex items-center justify-between gap-4 rounded-xl px-4 py-3 border transition-all ${
-          cpagripDone
-            ? 'bg-green-500/10 border-green-500/30'
-            : 'bg-cit-card border-cit-border hover:border-gold-400/50'
-        }`}>
-          <div className="flex items-center gap-3 min-w-0">
-            <span className="text-2xl shrink-0">💰</span>
-            <div className="min-w-0">
-              <p className={`font-bold text-sm ${cpagripDone ? 'text-green-400' : 'text-white'}`}>
-                Complète une offre gratuite
-              </p>
-              <p className="text-gray-500 text-xs">Offre adaptée à ton appareil — rapide et gratuit</p>
-            </div>
-          </div>
-          <div className="flex items-center gap-2 shrink-0">
-            <span className={`font-bangers text-lg ${cpagripDone ? 'text-green-400' : 'text-gold-400'}`}>
-              {cpagripDone ? '✓' : '+100'}
-            </span>
-            {!cpagripDone && (
-              <a
-                href={getCPAGripUrl(null)}
-                target="_blank"
-                rel="noopener noreferrer"
-                onClick={() => setTimeout(() => handleCPAGrip('cpagrip'), 5000)}
-                className="text-xs font-bold px-3 py-1.5 rounded-lg transition-colors bg-green-600 hover:bg-green-500 text-white"
-              >
-                Obtenir
-              </a>
-            )}
-          </div>
-        </div>
-      )}
+        <a
+          href={`/fr/booster/offres?entry_id=${entryId}`}
+          className="block w-full text-center bg-green-600 hover:bg-green-500 text-white font-bold text-sm py-2.5 rounded-lg transition-colors"
+        >
+          Voir les offres →
+        </a>
+      </div>
 
       {/* Referral */}
       <div className="bg-indigo-500/10 border border-indigo-500/30 rounded-xl p-4">

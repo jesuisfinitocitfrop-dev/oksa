@@ -89,6 +89,58 @@
     "discord": "Discord",
     "rules": "Règlement"
   },
+  "booster": {
+    "title": "Booste tes chances",
+    "subtitle": "Plus de chances = plus de chances de gagner !",
+    "noEntry": "Tu dois d'abord t'inscrire au giveaway.",
+    "noEntryLink": "S'inscrire maintenant",
+    "currentChances": "Tes chances actuelles",
+    "freeActions": "Actions gratuites",
+    "referral": "Parrainage",
+    "referralDesc": "Ton ami s'inscrit → +3 chances (cumulable)",
+    "referralPer": "+3 / ami",
+    "referralCopy": "Copier",
+    "referralCopied": "Copié !",
+    "offerwall": {
+      "title": "Offres partenaires",
+      "subtitle": "Gagne de 20 à 700+ chances par offre",
+      "desc": "Choisis une offre rapide adaptée à toi (souvent moins de 30 secondes). Plus l'offre est complète, plus tu gagnes.",
+      "cta": "Voir les offres disponibles →",
+      "feature1": "50+ offres disponibles",
+      "feature2": "Chances créditées automatiquement",
+      "feature3": "Cumule plusieurs offres",
+      "cooldown": "Limite atteinte — Réessaie dans une heure",
+      "completions": "offre(s) déjà complétée(s)"
+    },
+    "stripe": {
+      "title": "Devenir Supporter — 1€ = +100 chances",
+      "desc": "Multiplie tes chances + badge 💎 Supporter affiché publiquement",
+      "cta": "BOOSTER"
+    },
+    "offres": {
+      "title": "Offres partenaires",
+      "badge": "🎁 OFFRES PARTENAIRES",
+      "heading": "Tu vas accéder aux offres",
+      "subheading": "Lis bien les instructions avant de commencer",
+      "how": "Comment ça marche :",
+      "how1": "Tu choisis l'offre qui te plaît (email à donner ou app à tester)",
+      "how2": "Tu la complètes en suivant les instructions à l'écran",
+      "how3": "Tes chances sont créditées automatiquement dans 1-5 minutes",
+      "how4": "Tu peux faire plusieurs offres différentes pour cumuler les chances",
+      "warningTitle": "⚠️ Important :",
+      "warning1": "Donne des infos réelles (sinon l'offre n'est pas validée)",
+      "warning2": "Ne soumets pas la même offre plusieurs fois",
+      "warning3": "Termine une offre avant d'en commencer une autre",
+      "cta": "Voir les offres maintenant →",
+      "back": "← Retour",
+      "loading": "Chargement des offres...",
+      "cooldown": "Trop de tentatives. Réessaie dans une heure.",
+      "notFound": "Inscription introuvable. Retourne sur la page principale."
+    },
+    "notification": {
+      "credited": "chances créditées ! Total :"
+    }
+  },
   "admin": {
     "login": {
       "title": "Connexion Admin",

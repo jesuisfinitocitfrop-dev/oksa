@@ -70,3 +70,53 @@ CREATE POLICY "Public can read completions"
   USING (true);
 
 -- Les paiements et completions sont gérés côté serveur (service role bypass RLS)
+
+-- ================================================
+-- Migration v3 : CPAGrip Postback + Booster
+-- ================================================
+
+-- 1. Colonne CPAGrip sur entries
+ALTER TABLE entries ADD COLUMN IF NOT EXISTS chances_from_cpagrip INTEGER NOT NULL DEFAULT 0;
+
+-- 2. Completions CPAGrip (une ligne par offre complétée par entry)
+CREATE TABLE IF NOT EXISTS cpagrip_completions (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  entry_id UUID NOT NULL REFERENCES entries(id) ON DELETE CASCADE,
+  offer_id TEXT NOT NULL,
+  payout_usd NUMERIC(10,4) NOT NULL,
+  chances_credited INTEGER NOT NULL,
+  tracking_id_received TEXT,
+  raw_postback JSONB,
+  ip_address TEXT,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  UNIQUE(entry_id, offer_id)
+);
+
+-- 3. Log audit de tous les postbacks reçus
+CREATE TABLE IF NOT EXISTS cpagrip_postback_log (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  received_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+  raw_body TEXT,
+  password_valid BOOLEAN NOT NULL DEFAULT false,
+  outcome TEXT NOT NULL DEFAULT 'pending',
+  error_message TEXT,
+  ip_address TEXT
+);
+
+-- 4. Table de cooldown (suivi des démarrages offer wall)
+CREATE TABLE IF NOT EXISTS cpagrip_starts (
+  id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+  entry_id UUID NOT NULL REFERENCES entries(id) ON DELETE CASCADE,
+  started_at TIMESTAMP WITH TIME ZONE DEFAULT NOW()
+);
+
+-- Index
+CREATE INDEX IF NOT EXISTS idx_cpagrip_completions_entry ON cpagrip_completions(entry_id);
+CREATE INDEX IF NOT EXISTS idx_cpagrip_completions_offer ON cpagrip_completions(offer_id);
+CREATE INDEX IF NOT EXISTS idx_cpagrip_starts_entry ON cpagrip_starts(entry_id);
+CREATE INDEX IF NOT EXISTS idx_cpagrip_postback_log_received ON cpagrip_postback_log(received_at);
+
+-- RLS : aucun accès public, tout passe par service_role
+ALTER TABLE cpagrip_completions ENABLE ROW LEVEL SECURITY;
+ALTER TABLE cpagrip_postback_log ENABLE ROW LEVEL SECURITY;
+ALTER TABLE cpagrip_starts ENABLE ROW LEVEL SECURITY;

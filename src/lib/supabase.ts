@@ -67,6 +67,28 @@ export type Payment = {
   created_at: string
 }
 
+export type CpagripCompletion = {
+  id: string
+  entry_id: string
+  offer_id: string
+  payout_usd: number
+  chances_credited: number
+  tracking_id_received: string | null
+  raw_postback: Record<string, string> | null
+  ip_address: string | null
+  created_at: string
+}
+
+export type CpagripPostbackLog = {
+  id: string
+  received_at: string
+  raw_body: string | null
+  password_valid: boolean
+  outcome: string
+  error_message: string | null
+  ip_address: string | null
+}
+
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL ?? 'https://placeholder.supabase.co'
 const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? 'placeholder'
 

@@ -89,6 +89,58 @@
     "discord": "Discord",
     "rules": "Rules"
   },
+  "booster": {
+    "title": "Boost Your Chances",
+    "subtitle": "More chances = more chances to win!",
+    "noEntry": "You need to register for the giveaway first.",
+    "noEntryLink": "Register now",
+    "currentChances": "Your current chances",
+    "freeActions": "Free actions",
+    "referral": "Referral",
+    "referralDesc": "Your friend registers → +3 chances (stackable)",
+    "referralPer": "+3 / friend",
+    "referralCopy": "Copy",
+    "referralCopied": "Copied!",
+    "offerwall": {
+      "title": "Partner Offers",
+      "subtitle": "Earn 20 to 700+ chances per offer",
+      "desc": "Choose a quick offer tailored to you (often less than 30 seconds). The more complete the offer, the more you earn.",
+      "cta": "See available offers →",
+      "feature1": "50+ offers available",
+      "feature2": "Chances credited automatically",
+      "feature3": "Stack multiple offers",
+      "cooldown": "Limit reached — Try again in an hour",
+      "completions": "offer(s) already completed"
+    },
+    "stripe": {
+      "title": "Become a Supporter — 1€ = +100 chances",
+      "desc": "Multiply your chances + 💎 Supporter badge displayed publicly",
+      "cta": "BOOST"
+    },
+    "offres": {
+      "title": "Partner Offers",
+      "badge": "🎁 PARTNER OFFERS",
+      "heading": "You are about to access the offers",
+      "subheading": "Read the instructions carefully before starting",
+      "how": "How it works:",
+      "how1": "Choose the offer you like (give an email or test an app)",
+      "how2": "Complete it by following the on-screen instructions",
+      "how3": "Your chances are credited automatically within 1-5 minutes",
+      "how4": "You can complete multiple different offers to stack chances",
+      "warningTitle": "⚠️ Important:",
+      "warning1": "Provide real information (otherwise the offer won't be validated)",
+      "warning2": "Don't submit the same offer multiple times",
+      "warning3": "Finish one offer before starting another",
+      "cta": "See offers now →",
+      "back": "← Back",
+      "loading": "Loading offers...",
+      "cooldown": "Too many attempts. Try again in an hour.",
+      "notFound": "Registration not found. Go back to the main page."
+    },
+    "notification": {
+      "credited": "chances credited! Total:"
+    }
+  },
   "admin": {
     "login": {
       "title": "Admin Login",

@@ -89,6 +89,58 @@
     "discord": "Discord",
     "rules": "Reglamento"
   },
+  "booster": {
+    "title": "Aumenta tus probabilidades",
+    "subtitle": "¡Más probabilidades = más chances de ganar!",
+    "noEntry": "Primero debes registrarte en el sorteo.",
+    "noEntryLink": "Registrarse ahora",
+    "currentChances": "Tus probabilidades actuales",
+    "freeActions": "Acciones gratuitas",
+    "referral": "Referidos",
+    "referralDesc": "Tu amigo se registra → +3 probabilidades (acumulable)",
+    "referralPer": "+3 / amigo",
+    "referralCopy": "Copiar",
+    "referralCopied": "¡Copiado!",
+    "offerwall": {
+      "title": "Ofertas de socios",
+      "subtitle": "Gana de 20 a 700+ probabilidades por oferta",
+      "desc": "Elige una oferta rápida adaptada a ti (a menudo menos de 30 segundos). Cuanto más completa sea la oferta, más ganas.",
+      "cta": "Ver ofertas disponibles →",
+      "feature1": "50+ ofertas disponibles",
+      "feature2": "Probabilidades acreditadas automáticamente",
+      "feature3": "Acumula múltiples ofertas",
+      "cooldown": "Límite alcanzado — Inténtalo en una hora",
+      "completions": "oferta(s) ya completada(s)"
+    },
+    "stripe": {
+      "title": "Ser Supporter — 1€ = +100 probabilidades",
+      "desc": "Multiplica tus probabilidades + insignia 💎 Supporter visible públicamente",
+      "cta": "IMPULSAR"
+    },
+    "offres": {
+      "title": "Ofertas de socios",
+      "badge": "🎁 OFERTAS DE SOCIOS",
+      "heading": "Vas a acceder a las ofertas",
+      "subheading": "Lee las instrucciones cuidadosamente antes de empezar",
+      "how": "Cómo funciona:",
+      "how1": "Elige la oferta que te guste (dar un correo o probar una app)",
+      "how2": "Complétala siguiendo las instrucciones en pantalla",
+      "how3": "Tus probabilidades se acreditan automáticamente en 1-5 minutos",
+      "how4": "Puedes completar múltiples ofertas para acumular probabilidades",
+      "warningTitle": "⚠️ Importante:",
+      "warning1": "Proporciona información real (de lo contrario la oferta no será validada)",
+      "warning2": "No envíes la misma oferta varias veces",
+      "warning3": "Termina una oferta antes de comenzar otra",
+      "cta": "Ver ofertas ahora →",
+      "back": "← Volver",
+      "loading": "Cargando ofertas...",
+      "cooldown": "Demasiados intentos. Inténtalo en una hora.",
+      "notFound": "Registro no encontrado. Vuelve a la página principal."
+    },
+    "notification": {
+      "credited": "probabilidades acreditadas. Total:"
+    }
+  },
   "admin": {
     "login": {
       "title": "Acceso Admin",
