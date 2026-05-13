@@ -47,6 +47,15 @@ const config: Config = {
         'slide-in': 'slideIn 0.6s ease-out forwards',
         'scale-in': 'scaleIn 0.4s ease-out forwards',
         'shake': 'shake 0.5s ease-in-out',
+        'box-shake': 'boxShake 0.08s ease-in-out infinite',
+        'lid-fly': 'lidFly 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94) forwards',
+        'reveal-rise': 'revealRise 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
+        'beam-spread': 'beamSpread 0.5s ease-out forwards',
+        'flash-in': 'flashIn 0.3s ease-out forwards',
+        'particle-burst': 'particleBurst 0.8s ease-out forwards',
+        'star-spin': 'starSpin 1.2s ease-out forwards',
+        'glow-explode': 'glowExplode 0.6s ease-out forwards',
+        'card-rise': 'cardRise 0.5s cubic-bezier(0.34, 1.56, 0.64, 1) forwards',
       },
       keyframes: {
         ember: {
@@ -78,6 +87,53 @@ const config: Config = {
           '0%, 100%': { transform: 'translateX(0)' },
           '25%': { transform: 'translateX(-5px)' },
           '75%': { transform: 'translateX(5px)' },
+        },
+        boxShake: {
+          '0%':   { transform: 'translate(0, 0) rotate(0deg)' },
+          '20%':  { transform: 'translate(-4px, -2px) rotate(-2deg)' },
+          '40%':  { transform: 'translate(4px, 2px) rotate(2deg)' },
+          '60%':  { transform: 'translate(-3px, 1px) rotate(-1.5deg)' },
+          '80%':  { transform: 'translate(3px, -1px) rotate(1.5deg)' },
+          '100%': { transform: 'translate(0, 0) rotate(0deg)' },
+        },
+        lidFly: {
+          '0%':   { transform: 'translateY(0) rotate(0deg) scale(1)', opacity: '1' },
+          '60%':  { transform: 'translateY(-180px) rotate(-25deg) scale(1.1)', opacity: '0.8' },
+          '100%': { transform: 'translateY(-280px) rotate(-40deg) scale(0.6)', opacity: '0' },
+        },
+        revealRise: {
+          '0%':   { transform: 'translateY(60px) scale(0.3)', opacity: '0' },
+          '60%':  { transform: 'translateY(-10px) scale(1.08)', opacity: '1' },
+          '100%': { transform: 'translateY(0) scale(1)', opacity: '1' },
+        },
+        beamSpread: {
+          '0%':   { transform: 'scaleY(0) scaleX(0)', opacity: '0.9' },
+          '50%':  { transform: 'scaleY(1) scaleX(1)', opacity: '0.7' },
+          '100%': { transform: 'scaleY(1.2) scaleX(1.1)', opacity: '0' },
+        },
+        flashIn: {
+          '0%':   { opacity: '0' },
+          '30%':  { opacity: '1' },
+          '100%': { opacity: '0' },
+        },
+        particleBurst: {
+          '0%':   { transform: 'translate(0,0) scale(1)', opacity: '1' },
+          '100%': { transform: 'var(--tx, 60px) var(--ty, -80px) scale(0)', opacity: '0' },
+        },
+        starSpin: {
+          '0%':   { transform: 'rotate(0deg) scale(0)', opacity: '1' },
+          '50%':  { opacity: '1' },
+          '100%': { transform: 'rotate(720deg) scale(1.5)', opacity: '0' },
+        },
+        glowExplode: {
+          '0%':   { transform: 'scale(0.5)', opacity: '0.8' },
+          '50%':  { transform: 'scale(2)', opacity: '0.4' },
+          '100%': { transform: 'scale(3)', opacity: '0' },
+        },
+        cardRise: {
+          '0%':   { transform: 'translateY(30px) scale(0.85)', opacity: '0' },
+          '70%':  { transform: 'translateY(-6px) scale(1.04)', opacity: '1' },
+          '100%': { transform: 'translateY(0) scale(1)', opacity: '1' },
         },
       },
       backgroundImage: {
