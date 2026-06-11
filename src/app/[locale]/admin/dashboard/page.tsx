@@ -4,6 +4,8 @@ import { useEffect, useState } from 'react'
 import { useTranslations } from 'next-intl'
 import { useRouter, useParams } from 'next/navigation'
 import Link from 'next/link'
+import { DICE_COLORS, MAX_DICE, type DiceColor } from '@/lib/dice'
+import { type NavTabs, type NavTabKey } from '@/lib/nav'
 
 function DiscordIcon({ className }: { className?: string }) {
   return (
@@ -67,6 +69,24 @@ type BonusAction = {
   sort_order: number
   is_active: boolean
 }
+
+const DICE_COLOR_META: { value: DiceColor; label: string; hex: string }[] = [
+  { value: 'red', label: 'Rouge', hex: '#EF4444' },
+  { value: 'orange', label: 'Orange', hex: '#F59E0B' },
+  { value: 'yellow', label: 'Jaune', hex: '#FACC15' },
+  { value: 'green', label: 'Vert', hex: '#22C55E' },
+  { value: 'blue', label: 'Bleu', hex: '#3B82F6' },
+  { value: 'purple', label: 'Violet', hex: '#A855F7' },
+]
+
+const NAV_TAB_META: { key: NavTabKey; label: string; icon: string }[] = [
+  { key: 'home', label: 'Accueil', icon: '🏠' },
+  { key: 'winners', label: 'Gagnants', icon: '🏆' },
+  { key: 'shop', label: 'Boutique', icon: '🛍️' },
+  { key: 'supporters', label: 'Supporters', icon: '💎' },
+  { key: 'dice', label: 'Color Dice', icon: '🎲' },
+  { key: 'premium', label: 'Premium', icon: '🏇' },
+]
 
 const ACTION_TYPES = [
   { value: 'discord', label: 'Discord', icon: '💬' },
@@ -140,9 +160,23 @@ export default function AdminDashboardPage() {
   const [savingBonus, setSavingBonus] = useState(false)
   const [editingBonus, setEditingBonus] = useState<BonusAction | null>(null)
 
+  // Color Dice
+  const [diceEnabled, setDiceEnabled] = useState<DiceColor[]>([...DICE_COLORS])
+  const [diceForced, setDiceForced] = useState<(DiceColor | null)[]>(Array(MAX_DICE).fill(null))
+  const [diceLoaded, setDiceLoaded] = useState(false)
+  const [diceSaving, setDiceSaving] = useState(false)
+  const [diceSaved, setDiceSaved] = useState(false)
+  const [diceError, setDiceError] = useState('')
+
+  // Onglets navbar
+  const [navTabs, setNavTabs] = useState<NavTabs | null>(null)
+  const [navSaving, setNavSaving] = useState(false)
+  const [navSaved, setNavSaved] = useState(false)
+  const [navError, setNavError] = useState('')
+
   const activeEdition = editions.find(e => e.is_active && !e.is_drawn)
 
-  useEffect(() => { fetchEditions() }, [])
+  useEffect(() => { fetchEditions(); fetchDiceConfig(); fetchNavTabs() }, [])
   useEffect(() => {
     if (activeEdition) {
       fetchEntryCount(activeEdition.id)
@@ -234,6 +268,74 @@ export default function AdminDashboardPage() {
       const data = await res.json()
       setStats(data)
     }
+  }
+
+  async function fetchDiceConfig() {
+    const res = await fetch('/api/admin/dice')
+    if (!res.ok) return
+    const data = await res.json()
+    if (data.config) {
+      setDiceEnabled((data.config.enabled_colors ?? []).filter((c: string) => DICE_COLORS.includes(c as DiceColor)))
+      setDiceForced(Array.from({ length: MAX_DICE }, (_, i) => {
+        const c = data.config.forced_colors?.[i]
+        return DICE_COLORS.includes(c) ? c : null
+      }))
+      setDiceLoaded(true)
+    }
+  }
+
+  function toggleDiceColor(color: DiceColor) {
+    setDiceSaved(false)
+    setDiceEnabled(prev =>
+      prev.includes(color) ? prev.filter(c => c !== color) : [...prev, color]
+    )
+  }
+
+  async function handleSaveDice() {
+    setDiceSaving(true)
+    setDiceSaved(false)
+    setDiceError('')
+    const res = await fetch('/api/admin/dice', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ enabled_colors: diceEnabled, forced_colors: diceForced }),
+    })
+    if (res.ok) {
+      setDiceSaved(true)
+    } else {
+      const data = await res.json().catch(() => ({}))
+      setDiceError(data.error ?? 'Erreur lors de la sauvegarde')
+    }
+    setDiceSaving(false)
+  }
+
+  async function fetchNavTabs() {
+    const res = await fetch('/api/admin/nav')
+    if (!res.ok) return
+    const data = await res.json()
+    if (data.tabs) setNavTabs(data.tabs)
+  }
+
+  async function toggleNavTab(key: NavTabKey) {
+    if (!navTabs || navSaving) return
+    const updated = { ...navTabs, [key]: !navTabs[key] }
+    setNavTabs(updated)
+    setNavSaving(true)
+    setNavSaved(false)
+    setNavError('')
+    const res = await fetch('/api/admin/nav', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ tabs: updated }),
+    })
+    if (res.ok) {
+      setNavSaved(true)
+    } else {
+      const data = await res.json().catch(() => ({}))
+      setNavError(data.error ?? 'Erreur lors de la sauvegarde')
+      fetchNavTabs() // recharge l'état réel en cas d'échec
+    }
+    setNavSaving(false)
   }
 
   async function handleLogout() {
@@ -882,6 +984,149 @@ export default function AdminDashboardPage() {
               </div>
             </div>
           )}
+        </div>
+
+        {/* ─── ONGLETS DU SITE ─────────────────────────── */}
+        <div className="mb-8">
+          <div className="mb-4">
+            <h2 className="font-bangers text-2xl text-white">🧭 Onglets du site</h2>
+            <p className="text-gray-500 text-sm">Active ou met en veille les onglets de la barre de navigation (sauvegarde automatique)</p>
+          </div>
+
+          <div className="bg-cit-card border border-cit-border rounded-xl p-5">
+            {!navTabs ? (
+              <p className="text-gray-500 text-sm">
+                Chargement... (si rien ne s&apos;affiche, exécute <code className="text-gold-400">supabase-nav-migration.sql</code> dans Supabase)
+              </p>
+            ) : (
+              <>
+                <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
+                  {NAV_TAB_META.map(tab => {
+                    const on = navTabs[tab.key]
+                    return (
+                      <button
+                        key={tab.key}
+                        onClick={() => toggleNavTab(tab.key)}
+                        disabled={navSaving}
+                        className={`flex flex-col items-center gap-2 rounded-xl border p-4 transition-all disabled:opacity-60 ${
+                          on
+                            ? 'border-green-500/40 bg-green-500/10'
+                            : 'border-cit-border bg-transparent opacity-60'
+                        }`}
+                      >
+                        <span className={`text-2xl ${on ? '' : 'grayscale'}`}>{tab.icon}</span>
+                        <span className={`text-sm font-bold ${on ? 'text-white' : 'text-gray-500'}`}>{tab.label}</span>
+                        <span className={`text-[11px] font-bold px-2 py-0.5 rounded-full ${
+                          on ? 'bg-green-500/20 text-green-400' : 'bg-gray-500/20 text-gray-500'
+                        }`}>
+                          {on ? '● Visible' : '○ En veille'}
+                        </span>
+                      </button>
+                    )
+                  })}
+                </div>
+                <div className="flex items-center gap-3 mt-3 min-h-[20px]">
+                  {navSaving && <p className="text-gray-500 text-sm">Sauvegarde...</p>}
+                  {navSaved && !navSaving && <p className="text-green-400 text-sm">✓ Sauvegardé !</p>}
+                  {navError && <p className="text-red-400 text-sm">Erreur : {navError}</p>}
+                </div>
+              </>
+            )}
+          </div>
+        </div>
+
+        {/* ─── COLOR DICE ──────────────────────────────── */}
+        <div className="mb-8">
+          <div className="flex items-center justify-between mb-4">
+            <div>
+              <h2 className="font-bangers text-2xl text-white">🎲 Color Dice</h2>
+              <p className="text-gray-500 text-sm">Contrôle les couleurs qui peuvent sortir sur les dés de la page Color Dice</p>
+            </div>
+            <Link
+              href={`/${locale}/dice`}
+              target="_blank"
+              className="text-xs text-gray-500 hover:text-gold-400 border border-cit-border hover:border-gold-400/30 rounded-lg px-3 py-1.5 transition-colors"
+            >
+              Voir la page ↗
+            </Link>
+          </div>
+
+          <div className="bg-cit-card border border-cit-border rounded-xl p-5">
+            {!diceLoaded ? (
+              <p className="text-gray-500 text-sm">
+                Chargement... (si rien ne s&apos;affiche, exécute <code className="text-gold-400">supabase-dice-migration.sql</code> dans Supabase)
+              </p>
+            ) : (
+              <>
+                {/* Couleurs activées */}
+                <p className="text-xs text-gray-400 uppercase tracking-wider mb-2">Couleurs autorisées (tirage aléatoire)</p>
+                <div className="flex flex-wrap gap-2 mb-5">
+                  {DICE_COLOR_META.map(c => {
+                    const on = diceEnabled.includes(c.value)
+                    return (
+                      <button
+                        key={c.value}
+                        onClick={() => toggleDiceColor(c.value)}
+                        className={`flex items-center gap-2 text-sm font-bold px-3 py-1.5 rounded-full border transition-all ${
+                          on ? 'text-white' : 'text-gray-600 opacity-50 grayscale'
+                        }`}
+                        style={{
+                          borderColor: on ? c.hex : '#1E1E2E',
+                          background: on ? `${c.hex}22` : 'transparent',
+                        }}
+                      >
+                        <span className="w-3 h-3 rounded-full inline-block" style={{ background: c.hex }} />
+                        {c.label}
+                        <span className="text-xs">{on ? '✓' : '✕'}</span>
+                      </button>
+                    )
+                  })}
+                </div>
+
+                {/* Couleurs forcées */}
+                <p className="text-xs text-gray-400 uppercase tracking-wider mb-1">Forcer le résultat par dé</p>
+                <p className="text-gray-600 text-xs mb-3">« Aléatoire » = le dé tire au hasard parmi les couleurs autorisées. Une couleur forcée sort à 100%, même si elle est désactivée au-dessus.</p>
+                <div className="grid grid-cols-2 md:grid-cols-3 gap-3 mb-5">
+                  {diceForced.map((forced, i) => (
+                    <div key={i}>
+                      <label className="block text-xs text-gray-500 mb-1">Dé {i + 1}</label>
+                      <select
+                        value={forced ?? 'random'}
+                        onChange={e => {
+                          setDiceSaved(false)
+                          setDiceForced(prev => prev.map((f, j) =>
+                            j === i ? (e.target.value === 'random' ? null : e.target.value as DiceColor) : f
+                          ))
+                        }}
+                        className="cit-input w-full rounded-lg px-3 py-2 text-sm"
+                        style={forced ? { borderColor: DICE_COLOR_META.find(c => c.value === forced)?.hex } : undefined}
+                      >
+                        <option value="random">🎲 Aléatoire</option>
+                        {DICE_COLOR_META.map(c => (
+                          <option key={c.value} value={c.value}>{c.label}</option>
+                        ))}
+                      </select>
+                    </div>
+                  ))}
+                </div>
+
+                <div className="flex items-center gap-3 flex-wrap">
+                  <button
+                    onClick={handleSaveDice}
+                    disabled={diceSaving || diceEnabled.length === 0}
+                    className="bg-gold-400 hover:bg-gold-300 text-cit-dark font-bold px-6 py-2 rounded-lg transition-colors disabled:opacity-60"
+                  >
+                    {diceSaving ? 'Sauvegarde...' : 'Sauvegarder'}
+                  </button>
+                  {diceEnabled.length === 0 && (
+                    <p className="text-red-400 text-sm">⚠️ Active au moins une couleur</p>
+                  )}
+                  {diceSaved && <p className="text-green-400 text-sm">✓ Config sauvegardée !</p>}
+                  {diceError && <p className="text-red-400 text-sm">Erreur : {diceError}</p>}
+                </div>
+              </>
+            )}
+          </div>
         </div>
 
         {/* ─── PAST EDITIONS ───────────────────────────── */}

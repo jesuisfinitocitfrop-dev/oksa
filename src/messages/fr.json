@@ -6,7 +6,28 @@
     "shop": "Boutique",
     "supporters": "Supporters",
     "premium": "🏇 Premium",
+    "dice": "Color Dice",
     "admin": "Admin"
+  },
+  "dice": {
+    "title": "Color Dice",
+    "subtitle": "Lance les dés et découvre tes couleurs !",
+    "theme": "Thème",
+    "themeBW": "B&W",
+    "themeNeon": "Néon",
+    "countLabel": "Nombre de dés",
+    "diceCount": "{count, plural, one {# dé} other {# dés}}",
+    "rollAgain": "Lancer encore !",
+    "possibleIntro": "Les couleurs possibles sont :",
+    "and": "et",
+    "colors": {
+      "red": "Rouge",
+      "orange": "Orange",
+      "yellow": "Jaune",
+      "green": "Vert",
+      "blue": "Bleu",
+      "purple": "Violet"
+    }
   },
   "hero": {
     "badge": "GIVEAWAY GRATUIT",

@@ -5,7 +5,28 @@
     "winners": "Ganadores",
     "shop": "Tienda",
     "supporters": "Supporters",
+    "dice": "Color Dice",
     "admin": "Admin"
+  },
+  "dice": {
+    "title": "Color Dice",
+    "subtitle": "¡Lanza los dados y descubre tus colores!",
+    "theme": "Tema",
+    "themeBW": "B&W",
+    "themeNeon": "Neón",
+    "countLabel": "Número de dados",
+    "diceCount": "{count, plural, one {# dado} other {# dados}}",
+    "rollAgain": "¡Lanzar de nuevo!",
+    "possibleIntro": "Los colores posibles son:",
+    "and": "y",
+    "colors": {
+      "red": "Rojo",
+      "orange": "Naranja",
+      "yellow": "Amarillo",
+      "green": "Verde",
+      "blue": "Azul",
+      "purple": "Violeta"
+    }
   },
   "hero": {
     "badge": "SORTEO GRATUITO",

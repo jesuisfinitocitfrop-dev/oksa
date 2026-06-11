@@ -1,10 +1,11 @@
 'use client'
 
 import { useTranslations } from 'next-intl'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import Link from 'next/link'
 import Image from 'next/image'
 import { usePathname } from 'next/navigation'
+import { type NavTabs } from '@/lib/nav'
 
 const FlagFR = () => (
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 3 2" width="18" height="12" className="rounded-sm shrink-0">
@@ -40,6 +41,14 @@ export default function Navbar({ locale }: { locale: string }) {
   const t = useTranslations('nav')
   const pathname = usePathname()
   const [menuOpen, setMenuOpen] = useState(false)
+  const [visibleTabs, setVisibleTabs] = useState<NavTabs | null>(null)
+
+  useEffect(() => {
+    fetch('/api/nav', { cache: 'no-store' })
+      .then(res => res.json())
+      .then(data => setVisibleTabs(data.tabs))
+      .catch(() => setVisibleTabs(null))
+  }, [])
 
   function switchLocale(newLocale: string) {
     // Remplace le segment locale dans l'URL (ex: /fr/winners → /en/winners)
@@ -48,12 +57,19 @@ export default function Navbar({ locale }: { locale: string }) {
     window.location.href = segments.join('/')
   }
 
-  const links: { href: string; label: string; highlight?: boolean }[] = [
-    { href: `/${locale}`, label: t('home') },
-    { href: `/${locale}/winners`, label: t('winners') },
-    { href: `/${locale}/supporters`, label: t('supporters') },
-    { href: `/${locale}/premium`, label: '🏇 Premium', highlight: true },
+  const allTabs: { key: keyof NavTabs; href: string; label: string; highlight?: boolean }[] = [
+    { key: 'home', href: `/${locale}`, label: t('home') },
+    { key: 'winners', href: `/${locale}/winners`, label: t('winners') },
+    { key: 'shop', href: `/${locale}/shop`, label: t('shop') },
+    { key: 'supporters', href: `/${locale}/supporters`, label: t('supporters') },
+    { key: 'dice', href: `/${locale}/dice`, label: t('dice') },
+    { key: 'premium', href: `/${locale}/premium`, label: '🏇 Premium', highlight: true },
   ]
+
+  // Tant que la config n'est pas chargée, on n'affiche que l'Accueil (évite le flash)
+  const links = visibleTabs
+    ? allTabs.filter(tab => visibleTabs[tab.key])
+    : allTabs.filter(tab => tab.key === 'home')
 
   return (
     <nav className="fixed top-0 left-0 right-0 z-50 bg-cit-dark/95 backdrop-blur-md border-b border-cit-border">

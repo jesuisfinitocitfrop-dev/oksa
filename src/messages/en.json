@@ -5,7 +5,28 @@
     "winners": "Winners",
     "shop": "Shop",
     "supporters": "Supporters",
+    "dice": "Color Dice",
     "admin": "Admin"
+  },
+  "dice": {
+    "title": "Color Dice",
+    "subtitle": "Roll the dice and discover your colors!",
+    "theme": "Theme",
+    "themeBW": "B&W",
+    "themeNeon": "Neon",
+    "countLabel": "Number of dice",
+    "diceCount": "{count, plural, one {# die} other {# dice}}",
+    "rollAgain": "Roll again!",
+    "possibleIntro": "The possible colors are:",
+    "and": "and",
+    "colors": {
+      "red": "Red",
+      "orange": "Orange",
+      "yellow": "Yellow",
+      "green": "Green",
+      "blue": "Blue",
+      "purple": "Purple"
+    }
   },
   "hero": {
     "badge": "FREE GIVEAWAY",
