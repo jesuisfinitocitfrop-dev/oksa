@@ -17,6 +17,9 @@
     "countLabel": "Number of dice",
     "diceCount": "{count, plural, one {# die} other {# dice}}",
     "rollAgain": "Roll again!",
+    "combo": "COMBO x{count}!",
+    "record": "Best: x{count}",
+    "jackpot": "JACKPOT!",
     "possibleIntro": "The possible colors are:",
     "and": "and",
     "colors": {

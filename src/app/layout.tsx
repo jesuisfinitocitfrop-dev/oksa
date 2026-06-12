@@ -24,9 +24,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         {/* CPAGrip — Content Locker */}
         <script type="text/javascript" src="https://getafilenow.com/script_include.php?id=1894796" async />
 
-        {/* Ezoic — Privacy/CMP scripts (RGPD, doit charger en premier) */}
-        <script data-cfasync="false" src="https://cmp.gatekeeperconsent.com/min.js" async />
-        <script data-cfasync="false" src="https://the.gatekeeperconsent.com/cmp.min.js" async />
       </head>
       <body suppressHydrationWarning className="bg-cit-dark text-white font-inter antialiased">
         {children}

@@ -3,19 +3,19 @@ export type NavTabKey = (typeof NAV_TAB_KEYS)[number]
 
 export type NavTabs = Record<NavTabKey, boolean>
 
-// Fallback si la table nav_settings n'existe pas encore : tout visible
-// (le défaut « en veille » est porté par la ligne créée par la migration)
-export const FALLBACK_NAV_TABS: NavTabs = {
+// État par défaut tant que l'admin n'a rien sauvegardé :
+// Accueil, Color Dice et Premium visibles, le reste en veille
+export const DEFAULT_NAV_TABS: NavTabs = {
   home: true,
-  winners: true,
-  shop: true,
-  supporters: true,
+  winners: false,
+  shop: false,
+  supporters: false,
   dice: true,
   premium: true,
 }
 
 export function sanitizeNavTabs(value: unknown): NavTabs {
-  const tabs = { ...FALLBACK_NAV_TABS }
+  const tabs = { ...DEFAULT_NAV_TABS }
   if (value && typeof value === 'object') {
     for (const key of NAV_TAB_KEYS) {
       const v = (value as Record<string, unknown>)[key]

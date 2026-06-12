@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { getServiceClient } from '@/lib/supabase'
 import { DICE_COLORS, MAX_DICE, isDiceColor, type DiceColor } from '@/lib/dice'
+import { readSiteConfig } from '@/lib/siteConfig'
 
 export const dynamic = 'force-dynamic'
 
@@ -13,18 +14,16 @@ export async function GET(request: NextRequest) {
   let enabled: DiceColor[] = [...DICE_COLORS]
   let forced: (DiceColor | null)[] = []
 
-  try {
-    const db = getServiceClient()
-    const { data } = await db.from('dice_config').select('*').eq('id', 1).single()
-    if (data) {
-      const e = (Array.isArray(data.enabled_colors) ? data.enabled_colors : []).filter(isDiceColor)
-      if (e.length > 0) enabled = e
-      forced = (Array.isArray(data.forced_colors) ? data.forced_colors : []).map(
-        (c: unknown) => (isDiceColor(c) ? c : null)
-      )
-    }
-  } catch {
-    // table absente ou Supabase non configuré → tirage 100% aléatoire
+  const config = await readSiteConfig<{ enabled_colors?: unknown; forced_colors?: unknown }>(
+    getServiceClient(),
+    'dice.json'
+  )
+  if (config) {
+    const e = (Array.isArray(config.enabled_colors) ? config.enabled_colors : []).filter(isDiceColor)
+    if (e.length > 0) enabled = e
+    forced = (Array.isArray(config.forced_colors) ? config.forced_colors : []).map(
+      (c: unknown) => (isDiceColor(c) ? c : null)
+    )
   }
 
   const colors: DiceColor[] = Array.from({ length: count }, (_, i) => {

@@ -995,9 +995,7 @@ export default function AdminDashboardPage() {
 
           <div className="bg-cit-card border border-cit-border rounded-xl p-5">
             {!navTabs ? (
-              <p className="text-gray-500 text-sm">
-                Chargement... (si rien ne s&apos;affiche, exécute <code className="text-gold-400">supabase-nav-migration.sql</code> dans Supabase)
-              </p>
+              <p className="text-gray-500 text-sm">Chargement...</p>
             ) : (
               <>
                 <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-3">
@@ -1053,9 +1051,7 @@ export default function AdminDashboardPage() {
 
           <div className="bg-cit-card border border-cit-border rounded-xl p-5">
             {!diceLoaded ? (
-              <p className="text-gray-500 text-sm">
-                Chargement... (si rien ne s&apos;affiche, exécute <code className="text-gold-400">supabase-dice-migration.sql</code> dans Supabase)
-              </p>
+              <p className="text-gray-500 text-sm">Chargement...</p>
             ) : (
               <>
                 {/* Couleurs activées */}
