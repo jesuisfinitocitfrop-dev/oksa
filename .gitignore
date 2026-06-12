@@ -25,3 +25,9 @@ Thumbs.db
 
 # Vercel
 .vercel
+
+# Claude Code (worktrees locaux, lourds)
+.claude/worktrees/
+
+# Artefact de build TypeScript
+tsconfig.tsbuildinfo
