@@ -1,5 +1,4 @@
 import type { Metadata } from 'next'
-import Script from 'next/script'
 import { Analytics } from '@vercel/analytics/next'
 import './[locale]/globals.css'
 
@@ -28,22 +27,6 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body suppressHydrationWarning className="bg-cit-dark text-white font-inter antialiased">
         {children}
         <Analytics />
-
-        {/* Ezoic — Script principal */}
-        <Script
-          src="//www.ezojs.com/ezoic/sa.min.js"
-          strategy="afterInteractive"
-        />
-        <Script id="ezoic-init" strategy="afterInteractive">{`
-          window.ezstandalone = window.ezstandalone || {};
-          ezstandalone.cmd = ezstandalone.cmd || [];
-        `}</Script>
-
-        {/* Ezoic — Analytics */}
-        <Script
-          src="//ezoicanalytics.com/analytics.js"
-          strategy="afterInteractive"
-        />
       </body>
     </html>
   )
