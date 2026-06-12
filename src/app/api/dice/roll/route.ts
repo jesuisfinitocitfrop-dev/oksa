@@ -1,5 +1,4 @@
 import { NextRequest, NextResponse } from 'next/server'
-import { getServiceClient } from '@/lib/supabase'
 import { DICE_COLORS, MAX_DICE, isDiceColor, type DiceColor } from '@/lib/dice'
 import { readSiteConfig } from '@/lib/siteConfig'
 
@@ -14,10 +13,7 @@ export async function GET(request: NextRequest) {
   let enabled: DiceColor[] = [...DICE_COLORS]
   let forced: (DiceColor | null)[] = []
 
-  const config = await readSiteConfig<{ enabled_colors?: unknown; forced_colors?: unknown }>(
-    getServiceClient(),
-    'dice.json'
-  )
+  const config = await readSiteConfig<{ enabled_colors?: unknown; forced_colors?: unknown }>('dice.json')
   if (config) {
     const e = (Array.isArray(config.enabled_colors) ? config.enabled_colors : []).filter(isDiceColor)
     if (e.length > 0) enabled = e

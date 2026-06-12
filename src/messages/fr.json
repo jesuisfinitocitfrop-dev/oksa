@@ -19,7 +19,6 @@
     "diceCount": "{count, plural, one {# dé} other {# dés}}",
     "rollAgain": "Lancer encore !",
     "combo": "COMBO x{count} !",
-    "record": "Record : x{count}",
     "jackpot": "JACKPOT !",
     "possibleIntro": "Les couleurs possibles sont :",
     "and": "et",

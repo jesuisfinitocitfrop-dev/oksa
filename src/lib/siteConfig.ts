@@ -4,11 +4,19 @@ import type { SupabaseClient } from '@supabase/supabase-js'
 // aucune table ni migration SQL nécessaire, la clé service suffit.
 const BUCKET = 'site-config'
 
-export async function readSiteConfig<T>(db: SupabaseClient, key: string): Promise<T | null> {
+// Lecture en fetch direct avec cache: 'no-store' : Next.js met sinon en cache
+// la réponse GET du storage et les changements admin ne sont jamais visibles.
+export async function readSiteConfig<T>(key: string): Promise<T | null> {
   try {
-    const { data, error } = await db.storage.from(BUCKET).download(key)
-    if (error || !data) return null
-    return JSON.parse(await data.text()) as T
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_SUPABASE_URL}/storage/v1/object/${BUCKET}/${key}`,
+      {
+        headers: { Authorization: `Bearer ${process.env.SUPABASE_SERVICE_ROLE_KEY}` },
+        cache: 'no-store',
+      }
+    )
+    if (!res.ok) return null
+    return (await res.json()) as T
   } catch {
     return null
   }
@@ -20,6 +28,7 @@ export async function writeSiteConfig(db: SupabaseClient, key: string, value: un
   const { error } = await db.storage.from(BUCKET).upload(key, JSON.stringify(value), {
     upsert: true,
     contentType: 'application/json',
+    cacheControl: '0',
   })
   return error ? error.message : null
 }

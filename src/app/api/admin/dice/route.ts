@@ -21,7 +21,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const stored = await readSiteConfig<typeof DEFAULT_CONFIG>(getServiceClient(), 'dice.json')
+  const stored = await readSiteConfig<typeof DEFAULT_CONFIG>('dice.json')
   return NextResponse.json({ config: stored ?? DEFAULT_CONFIG })
 }
 

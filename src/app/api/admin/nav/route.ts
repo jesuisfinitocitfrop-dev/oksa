@@ -16,7 +16,7 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ error: 'Unauthorized' }, { status: 401 })
   }
 
-  const stored = await readSiteConfig(getServiceClient(), 'nav.json')
+  const stored = await readSiteConfig('nav.json')
   return NextResponse.json({ tabs: sanitizeNavTabs(stored) })
 }
 

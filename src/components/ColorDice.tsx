@@ -15,27 +15,50 @@ const COLOR_STYLES: Record<DiceColor, { gradient: string; glow: string; text: st
 
 // Fenêtre pendant laquelle relancer compte comme un combo
 const COMBO_WINDOW = 4000
-const BEST_COMBO_KEY = 'citgive-dice-best-combo'
+// Délai sans clic après lequel on considère que le joueur a « relâché » → révélation
+const RELEASE_DELAY = 650
 
 function randomColor(): DiceColor {
   return DICE_COLORS[Math.floor(Math.random() * DICE_COLORS.length)]
 }
 
-function Die({ color, theme, rolling, index }: { color: DiceColor; theme: string; rolling: boolean; index: number }) {
+function Die({
+  color, theme, hidden, shaking, index,
+}: {
+  color: DiceColor; theme: string; hidden: boolean; shaking: boolean; index: number
+}) {
   const s = COLOR_STYLES[color]
   const neon = theme === 'neon'
+
+  if (hidden) {
+    return (
+      <div
+        className={`relative w-20 h-20 md:w-24 md:h-24 rounded-2xl flex items-center justify-center ${
+          shaking ? 'animate-shake' : ''
+        }`}
+        style={{
+          background: 'linear-gradient(135deg, #3A3A4E 0%, #23232F 55%, #16161E 100%)',
+          boxShadow: '0 0 18px rgba(255,255,255,0.12), inset 0 2px 4px rgba(255,255,255,0.15)',
+          border: '3px solid rgba(255,255,255,0.15)',
+          animationDelay: `${index * 0.05}s`,
+          animationIterationCount: shaking ? 'infinite' : undefined,
+        }}
+      >
+        <span className="font-bangers text-3xl md:text-4xl text-white/70 select-none">?</span>
+      </div>
+    )
+  }
+
   return (
     <div
-      className={`relative w-20 h-20 md:w-24 md:h-24 rounded-2xl flex items-center justify-center transition-transform duration-150 ${
-        rolling ? 'animate-shake' : 'animate-scale-in'
-      }`}
+      className="relative w-20 h-20 md:w-24 md:h-24 rounded-2xl flex items-center justify-center animate-scale-in"
       style={{
         background: s.gradient,
         boxShadow: neon
           ? `0 0 25px ${s.glow}, 0 0 60px ${s.glow}, 0 0 100px ${s.glow}66, inset 0 2px 4px rgba(255,255,255,0.4)`
           : `0 0 18px ${s.glow}AA, 0 0 45px ${s.glow}55, inset 0 2px 4px rgba(255,255,255,0.4)`,
         border: '3px solid rgba(255,255,255,0.25)',
-        animationDelay: rolling ? `${index * 0.05}s` : `${index * 0.08}s`,
+        animationDelay: `${index * 0.08}s`,
       }}
     >
       <div
@@ -52,70 +75,45 @@ export default function ColorDice() {
   const [count, setCount] = useState(3)
   const [dice, setDice] = useState<DiceColor[]>(() => Array.from({ length: 3 }, randomColor))
   const [possible, setPossible] = useState<DiceColor[]>([...DICE_COLORS])
-  const [rolling, setRolling] = useState(false)
-  const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null)
+  const [hidden, setHidden] = useState(true)
+  const [shaking, setShaking] = useState(false)
 
   // Combo
   const [combo, setCombo] = useState(0)
-  const [bestCombo, setBestCombo] = useState(0)
   const [jackpot, setJackpot] = useState(false)
   const comboRef = useRef(0)
-  const bestRef = useRef(0)
   const comboTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null)
-  // identifiant du dernier lancer : un spam relance et invalide les lancers précédents
-  const rollIdRef = useRef(0)
-
-  useEffect(() => {
-    const saved = Number(localStorage.getItem(BEST_COMBO_KEY) ?? 0)
-    if (saved > 0) {
-      bestRef.current = saved
-      setBestCombo(saved)
-    }
-  }, [])
+  const releaseTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
+  // identifiant de la dernière révélation : un nouveau clic invalide celle en cours
+  const revealIdRef = useRef(0)
 
   const bumpCombo = useCallback((amount: number) => {
     if (comboTimeoutRef.current) clearTimeout(comboTimeoutRef.current)
     comboRef.current += amount
     setCombo(comboRef.current)
-    if (comboRef.current > bestRef.current) {
-      bestRef.current = comboRef.current
-      setBestCombo(comboRef.current)
-      try { localStorage.setItem(BEST_COMBO_KEY, String(comboRef.current)) } catch { /* stockage indisponible */ }
-    }
     comboTimeoutRef.current = setTimeout(() => {
       comboRef.current = 0
       setCombo(0)
     }, COMBO_WINDOW)
   }, [])
 
-  const roll = useCallback(async (n: number, fast = false) => {
-    const rollId = ++rollIdRef.current
-    if (intervalRef.current) clearInterval(intervalRef.current)
-    setRolling(true)
-
-    // animation : les dés cyclent au hasard pendant que le serveur tire le vrai résultat
-    intervalRef.current = setInterval(() => {
-      setDice(Array.from({ length: n }, randomColor))
-    }, 90)
-
-    // plus le combo monte, plus les lancers sont rapides
-    const duration = fast ? Math.max(400, 1200 - comboRef.current * 120) : 1200
-    const minDelay = new Promise(resolve => setTimeout(resolve, duration))
+  // Révélation : le serveur tire les couleurs (forcées par l'admin si définies, sinon aléatoires)
+  const reveal = useCallback(async (n: number) => {
+    const revealId = ++revealIdRef.current
     let result: { colors?: DiceColor[]; possible?: DiceColor[] } = {}
     try {
       const res = await fetch(`/api/dice/roll?count=${n}`, { cache: 'no-store' })
       if (res.ok) result = await res.json()
-    } catch { /* réseau KO → on garde des couleurs aléatoires locales */ }
-    await minDelay
+    } catch { /* réseau KO → couleurs aléatoires locales */ }
 
-    // un lancer plus récent a pris la main pendant qu'on attendait
-    if (rollIdRef.current !== rollId) return
+    // le joueur a recliqué pendant la requête : on reste caché
+    if (revealIdRef.current !== revealId) return
 
-    if (intervalRef.current) clearInterval(intervalRef.current)
     const final = result.colors?.length ? result.colors : Array.from({ length: n }, randomColor)
     setDice(final)
     if (result.possible?.length) setPossible(result.possible)
-    setRolling(false)
+    setShaking(false)
+    setHidden(false)
 
     // JACKPOT : tous les dés de la même couleur (à partir de 2 dés)
     if (n >= 2 && final.every(c => c === final[0])) {
@@ -125,15 +123,25 @@ export default function ColorDice() {
     }
   }, [bumpCombo])
 
+  // Chaque clic cache les dés et nourrit le combo ; la révélation
+  // ne part que RELEASE_DELAY ms après le DERNIER clic (le « relâchement »)
   function handleRollClick() {
     bumpCombo(1)
-    roll(count, true)
+    setHidden(true)
+    setShaking(true)
+    revealIdRef.current++ // annule une révélation en vol
+    if (releaseTimerRef.current) clearTimeout(releaseTimerRef.current)
+    releaseTimerRef.current = setTimeout(() => reveal(count), RELEASE_DELAY)
   }
 
   useEffect(() => {
-    roll(count)
+    setHidden(true)
+    setShaking(true)
+    revealIdRef.current++
+    if (releaseTimerRef.current) clearTimeout(releaseTimerRef.current)
+    releaseTimerRef.current = setTimeout(() => reveal(count), RELEASE_DELAY)
     return () => {
-      if (intervalRef.current) clearInterval(intervalRef.current)
+      if (releaseTimerRef.current) clearTimeout(releaseTimerRef.current)
       if (comboTimeoutRef.current) clearTimeout(comboTimeoutRef.current)
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -190,7 +198,7 @@ export default function ColorDice() {
       {/* ── Les dés ── */}
       <div className="flex flex-wrap items-center justify-center gap-5 md:gap-6 mb-8 min-h-[96px]">
         {dice.map((color, i) => (
-          <Die key={i} color={color} theme={theme} rolling={rolling} index={i} />
+          <Die key={i} color={color} theme={theme} hidden={hidden} shaking={shaking} index={i} />
         ))}
       </div>
 
@@ -217,17 +225,13 @@ export default function ColorDice() {
         )}
       </div>
 
-      {/* ── Bouton lancer (spam autorisé : chaque clic relance et nourrit le combo) ── */}
+      {/* ── Bouton lancer (spam = combo : les dés restent cachés tant qu'on clique) ── */}
       <button
         onClick={handleRollClick}
         className="btn-fire rounded-2xl px-12 md:px-16 py-4 font-bangers text-2xl md:text-3xl text-cit-dark tracking-wider w-full max-w-md md:w-auto select-none"
       >
         <span>{t('rollAgain')}</span>
       </button>
-
-      {bestCombo >= 2 && (
-        <p className="text-gray-500 text-xs mt-3">🏆 {t('record', { count: bestCombo })}</p>
-      )}
 
       {/* ── Couleurs possibles ── */}
       <div className="mt-10 bg-cit-card/80 border border-cit-border rounded-full px-6 py-3 text-sm text-gray-300 text-center">
